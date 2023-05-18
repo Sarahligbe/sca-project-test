@@ -1,6 +1,11 @@
 output vnet_id {
-  description = "Specifies the vnet id of the virtual network"
+  description = "Specifies the id of the virtual network"
   value       = azurerm_virtual_network.vnet.id
+}
+
+output vnet_name {
+  description = "Specifies the name of the virtual network"
+  value       = azurerm_virtual_network.vnet.name
 }
 
 output subnet_ids {

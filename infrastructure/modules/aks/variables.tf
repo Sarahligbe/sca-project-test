@@ -1,101 +1,17 @@
-variable "rg_name" {
+variable "resource_group_name" {
+  description = "The name of the resource group to provision the AKS cluster"
   type = string
-  description = "The name of the resource group to deploy resources"
 }
 
 variable "location" {
-  type = string
-  description = "The Azure region to provision resources in"
-  default = "UK South"
-}
-
-variable "hub_vnet" {
-  description = "Specifies the name of the hub virtual network"
-  default = "hub_vnet"
+  description = "The Azure region to provision the AKS cluster"
   type = string
 }
 
 variable "tags" {
-  description = "Specifies the tags to label resources"
+  description = "Tags to label resources"
   type = map
   default = {}
-}
-
-variable "hub_address_space" {
-  description = "Specifies the address space for the hub virtual network"
-  default = ["10.0.0.0/16"]
-  type = list(string)
-}
-
-variable "firewall_subnet_address_prefix" {
-  description = "Specifies the address prefix of the firewall subnet"
-  default = ["10.0.0.0/24"]
-  type = list(string)
-}
-
-variable "bastion_subnet_address_prefix" {
-  description = "Specifies the address prefix of the bastion subnet"
-  default = ["10.0.1.0/24"]
-  type = list(string)
-}
-
-variable "aks_vnet" {
-  description = "Specifies the name of the spoke virtual network where the aks is hosted"
-  default = "aks_vnet"
-  type = string
-}
-
-variable "aks_address_space" {
-  description = "Specifies the address space for the aks virtual network"
-  default = ["10.1.0.0/16"]
-  type = list(string)
-}
-
-variable "aks_subnet_address_prefix" {
-  description = "Specifies the address prefix of the firewall subnet"
-  default = ["10.1.0.0/20"]
-  type = list(string)
-}
-
-variable "vm_subnet_address_prefix" {
-  description = "Specifies the address prefix of the bastion subnet"
-  default = ["10.1.32.0/20"]
-  type = list(string)
-}
-
-variable "public_ip_name" {
-  description = "Specifies the name of the firewall's public IP"
-  type = string
-  default = "sca-fw-ip"
-}
-
-variable "fw_name" {
-  description = "Specifies the name of the firewall"
-  type = string
-}
-
-variable "fw_sku_name" {
-  description = "Specifies the SKU name of the firewall"
-  type = string
-  default = "AZFW_VNet"
-}
-
-variable "fw_sku_tier" {
-  description = "Specifies the SKU tier of the firewall"
-  type = string
-  default = "Standard"
-}
-
-variable "fw_threat_intel_mode" {
-  description = "Specifies the operation mode for threat intelligence-based filtering"
-  type = string
-  default = "Alert"
-}
-
-variable "zones" {
-  description = "Specifies the availability zones in the region"
-  type = list(string)
-  default = [ "1", "2", "3" ]
 }
 
 variable "name" {
@@ -176,6 +92,12 @@ variable "default_node_pool_vm_size" {
   type        = string
 }
 
+variable "default_node_pool_availability_zones" {
+  description = "Specifies the availability zones of the default node pool"
+  default     = ["1", "2", "3"]
+  type        = list(string)
+}
+
 variable "default_node_pool_enable_auto_scaling" {
   description = "Specifies whether to enable cluster auto-scaler."
   type          = bool
@@ -246,33 +168,3 @@ variable "outbound_type" {
   type        = string
   default     = "userDefinedRouting"
 }
-
-variable "bastion_name" {
-  description = "Specifies the name of the bastion host"
-  type = string
-  default = "scaBastion"
-}
-
-variable "os_disk_size" {
-  description = "Specifies the size of the VM operating system"
-  type = string
-  default = "Standard_B2s"
-}
-
-variable "os_disk_image" {
-  description = "Specifies the os disk image of the virtual machine"
-  type        = map(string)
-  default     = {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "20.04-LTS" 
-    version   = "latest"
-  }
-}
-
-variable "vm_name" {
-  description = "Specifies the name of the virtual machine"
-  type = string
-  default = "scaVM"
-}
-
