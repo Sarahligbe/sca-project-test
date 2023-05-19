@@ -58,6 +58,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "policies" {
         "mcr.microsoft.com",
         "*.data.mcr.microsoft.com",
         "management.azure.com",
+        "vault.azure.net",
         "login.microsoftonline.com",
         "acs-mirror.azureedge.net",
         "dc.services.visualstudio.com",
@@ -65,6 +66,9 @@ resource "azurerm_firewall_policy_rule_collection_group" "policies" {
         "*.oms.opinsights.azure.com",
         "*.microsoftonline.com",
         "*.monitoring.azure.com",
+        "data.policy.core.windows.net",
+        "store.policy.core.windows.net",
+        "*.dp.kubernetesconfiguration.azure.com"
       ]
 
       protocols {
@@ -86,6 +90,8 @@ resource "azurerm_firewall_policy_rule_collection_group" "policies" {
         "download.opensuse.org",
         "security.ubuntu.com",
         "ntp.ubuntu.com",
+        "changelogs.ubuntu.com",
+        "azure.archive.ubuntu.com",
         "packages.microsoft.com",
         "snapcraft.io"
       ]
@@ -194,13 +200,13 @@ resource "azurerm_firewall_policy_rule_collection_group" "policies" {
       protocols             = ["Any"]
     }
 
-    rule {
-      name                  = "Internet"
-      source_addresses      = ["*"]
-      destination_ports     = ["*"]
-      destination_addresses = ["*"]
-      protocols             = ["TCP"]
-    }
+#    rule {
+#      name                  = "Internet"
+#      source_addresses      = ["*"]
+#      destination_ports     = ["*"]
+#      destination_addresses = ["*"]
+#      protocols             = ["TCP"]
+#    }
   }
 
   lifecycle {

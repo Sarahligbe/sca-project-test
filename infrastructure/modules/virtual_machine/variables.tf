@@ -9,6 +9,11 @@ variable "resource_group_name" {
   type = string
 }
 
+variable "dns_resource_group_name" {
+  description = "The name of the resource group to connect the private link to"
+  type = string
+}
+
 variable "location" {
   description = "The Azure region to provision the VM"
   type = string
@@ -52,4 +57,14 @@ variable "os_disk_image" {
     version   = "20.04.202305150"
 
   }
+}
+
+variable vnet_id {
+  description = "Specifies the ID of the VNET where jumpbox VM will be installed"
+  type        = string
+}
+
+variable dns_zone_name {
+  description = "Private DNS Zone name to link jumpbox's vnet to"
+  type        = string
 }

@@ -1,6 +1,8 @@
 # Local .terraform directories
 **/.terraform/*
 
+infrastructure-addons/roles/nginx-ingress-controller/
+infrastructure/modules/bastion/
 
 # .tfstate files
 *.tfstate

@@ -3,7 +3,7 @@ data "azurerm_client_config" "current" {
 
 locals {
   key_vault_private_dns_zone = "privatelink.vaultcore.azure.net"
-  bastion_public_ip = "${tostring(module.bastion_host.public_ip)}"
+  vm_public_ip = "${tostring(module.virtual_machine.public_ip)}"
 }
 
 resource "azurerm_resource_group" "main" {
@@ -25,8 +25,8 @@ module "hub_vnet" {
     },
 
     {
-      name : "AzureBastionSubnet"
-      address_prefixes : var.bastion_subnet_address_prefix
+      name : "azureVMSubnet"
+      address_prefixes : var.vm_subnet_address_prefix
     }
   ]
 
@@ -44,11 +44,6 @@ module "aks_vnet" {
     {
       name : "aksNodePoolSubnet"
       address_prefixes : var.aks_subnet_address_prefix
-    },
-
-    {
-      name : "azureVMSubnet"
-      address_prefixes : var.vm_subnet_address_prefix
     }
   ]
 
@@ -133,13 +128,13 @@ resource "azurerm_role_assignment" "network_contributor" {
   skip_service_principal_aad_check = true
 }
 
-module "bastion_host" {
-  source                       = "./modules/bastion"
-  bastion_name                 = var.bastion_name
-  location                     = var.location
-  resource_group_name          = azurerm_resource_group.main.name
-  subnet_id                    = module.hub_vnet.subnet_ids["AzureBastionSubnet"]
-}
+#module "bastion_host" {
+#  source                       = "./modules/bastion"
+#  bastion_name                 = var.bastion_name
+#  location                     = var.location
+#  resource_group_name          = azurerm_resource_group.main.name
+#  subnet_id                    = module.hub_vnet.subnet_ids["AzureBastionSubnet"]
+#}
 
 module "virtual_machine" {
   source                              = "./modules/virtual_machine"
@@ -152,14 +147,16 @@ module "virtual_machine" {
   resource_group_name                 = azurerm_resource_group.main.name
   subnet_id                           = module.aks_vnet.subnet_ids["azureVMSubnet"]
   tags                                = var.tags
+  dns_zone_name                       = join(".", slice(split(".", module.aks_cluster.private_fqdn), 1, length(split(".", module.aks_cluster.private_fqdn))))
+  dns_resource_group_name             = module.aks_cluster.node_resource_group
 }
 
-resource "azurerm_role_assignment" "aks_cluster_admin" {
-  scope                = azurerm_resource_group.main.id
-  role_definition_name = "Azure Kubernetes Service Cluster User Role"
-  principal_id         = module.virtual_machine.vm_identity_principal_id
-  skip_service_principal_aad_check = true
-}
+#resource "azurerm_role_assignment" "aks_cluster_admin" {
+#  scope                = azurerm_resource_group.main.id
+#  role_definition_name = "Azure Kubernetes Service Cluster User Role"
+#  principal_id         = module.virtual_machine.vm_identity_principal_id
+#  skip_service_principal_aad_check = true
+#}
 
 module "key_vault" {
   source                          = "./modules/key_vault"
@@ -233,9 +230,9 @@ resource "azurerm_private_endpoint" "key_vault" {
   }
 }
 
-resource "null_resource" "copy_bastion_ip" {
+resource "null_resource" "copy_vm_ip" {
   triggers = {
-    public_ip = "${local.bastion_public_ip}"
+    public_ip = "${local.vm_public_ip}"
   }
 
 #On resource creation
@@ -249,6 +246,6 @@ resource "null_resource" "copy_bastion_ip" {
     command = "truncate -s 0 ../infrastructure-addons/host-inventory && sed -i 's/@'${self.triggers.public_ip}'/@/' ../infrastructure-addons/ansible.cfg"
   }
 
-  depends_on = [module.bastion_host]
+  depends_on = [module.virtual_machine]
 }
 

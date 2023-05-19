@@ -1,3 +1,17 @@
+resource "azurerm_public_ip" "public_ip" {
+  name                = "${var.name}PublicIp"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  allocation_method   = "Dynamic"
+  sku                 = "Standard"
+
+  lifecycle {
+      ignore_changes = [
+          tags
+      ]
+  }
+}
+
 resource "azurerm_network_security_group" "nsg" {
   name                = "${var.name}Nsg"
   location            = var.location
@@ -33,6 +47,7 @@ resource "azurerm_network_interface" "nic" {
     name                          = "Configuration"
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.public_ip.id
   }
 
   lifecycle {
@@ -49,19 +64,19 @@ resource "azurerm_network_interface_security_group_association" "nsg_association
   depends_on = [azurerm_network_security_group.nsg]
 }
 
-resource "azurerm_user_assigned_identity" "vm_identity" {
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  tags                = var.tags
-
-  name = "${var.name}Identity"
-
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
-}
+#resource "azurerm_user_assigned_identity" "vm_identity" {
+#  resource_group_name = var.resource_group_name
+#  location            = var.location
+#  tags                = var.tags
+#
+#  name = "${var.name}Identity"
+#
+#  lifecycle {
+#    ignore_changes = [
+#      tags
+#    ]
+#  }
+#}
 
 resource "azurerm_linux_virtual_machine" "main" {
   name                = var.name
@@ -91,13 +106,20 @@ resource "azurerm_linux_virtual_machine" "main" {
     version   = var.os_disk_image["version"]
   }
 
-  identity {
-    type = "UserAssigned"
-    identity_ids = tolist([azurerm_user_assigned_identity.vm_identity.id])
-  }
+#  identity {
+#    type = "UserAssigned"
+#    identity_ids = tolist([azurerm_user_assigned_identity.vm_identity.id])
+#  }
 
   depends_on = [
     azurerm_network_interface.nic,
     azurerm_network_security_group.nsg
   ]
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "hublink" {
+  name                  = "hubvnetlink"
+  resource_group_name   = var.resource_group_name
+  private_dns_zone_name = var.dns_zone_name
+  virtual_network_id    = var.vnet_id
 }
