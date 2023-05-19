@@ -45,11 +45,11 @@ variable "bastion_name" {
   default = "scaBastion"
 }
 
-variable "bastion_subnet_address_prefix" {
-  description = "Specifies the address prefix of the bastion subnet"
-  default = ["10.0.1.0/24"]
-  type = list(string)
-}
+#variable "bastion_subnet_address_prefix" {
+#  description = "Specifies the address prefix of the bastion subnet"
+#  default = ["10.0.1.0/24"]
+#  type = list(string)
+#}
 
 variable "aks_vnet" {
   description = "Specifies the name of the spoke virtual network where the aks is hosted"
@@ -71,7 +71,7 @@ variable "aks_subnet_address_prefix" {
 
 variable "vm_subnet_address_prefix" {
   description = "Specifies the address prefix of the bastion subnet"
-  default = ["10.1.32.0/20"]
+  default = ["10.0.1.0/24"]
   type = list(string)
 }
 

@@ -145,8 +145,9 @@ module "virtual_machine" {
   os_disk_size                        = var.os_disk_size
   os_disk_image                       = var.os_disk_image
   resource_group_name                 = azurerm_resource_group.main.name
-  subnet_id                           = module.aks_vnet.subnet_ids["azureVMSubnet"]
+  subnet_id                           = module.hub_vnet.subnet_ids["azureVMSubnet"]
   tags                                = var.tags
+  vnet_id                             = module.hub_vnet.vnet_id
   dns_zone_name                       = join(".", slice(split(".", module.aks_cluster.private_fqdn), 1, length(split(".", module.aks_cluster.private_fqdn))))
   dns_resource_group_name             = module.aks_cluster.node_resource_group
 }
@@ -208,7 +209,7 @@ resource "azurerm_private_endpoint" "key_vault" {
   name                = "${title(module.key_vault.name)}PrivateEndpoint"
   location            = var.location
   resource_group_name = azurerm_resource_group.main.name
-  subnet_id           = module.aks_vnet.subnet_ids["azureVMSubnet"]
+  subnet_id           = module.hub_vnet.subnet_ids["azureVMSubnet"]
   tags                = var.tags
 
   private_service_connection {
