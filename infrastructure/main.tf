@@ -245,8 +245,8 @@ resource "null_resource" "copy_bastion_ip" {
 
 #On resource destruction
   provisioner "local-exec" {
-    when = "destroy"
-    command = "truncate -s 0 ../infrastructure-addons/host-inventory && sed -i 's/@'${self.triggerspublic_ip}'/@/' ansible.cfg"
+    when = destroy
+    command = "truncate -s 0 ../infrastructure-addons/host-inventory && sed -i 's/@'${self.triggers.public_ip}'/@/' ansible.cfg"
   }
 
   depends_on = [module.bastion_host]
