@@ -23,5 +23,5 @@ output "public_ip" {
   value = azurerm_public_ip.public_ip.ip_address
   description = "Specifies the public IP address of the bastion host"
 
-  depends_on = [azurem_public_ip.public_ip]
+  depends_on = [azurem_bastion_host.bastion_host]
 }
