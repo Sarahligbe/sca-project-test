@@ -153,6 +153,13 @@ module "virtual_machine" {
   tags                                = var.tags
 }
 
+resource "azurerm_role_assignment" "virtual_machine_contributor" {
+  scope                = azurerm_resource_group.main.id
+  role_definition_name = "Virtual Machine Contributor"
+  principal_id         = module.virtual_machine.vm_identity_principal_id
+  skip_service_principal_aad_check = true
+}
+
 module "key_vault" {
   source                          = "./modules/key_vault"
   name                            = var.key_vault_name
