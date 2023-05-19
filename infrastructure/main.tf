@@ -156,7 +156,7 @@ module "virtual_machine" {
 
 resource "azurerm_role_assignment" "aks_cluster_admin" {
   scope                = azurerm_resource_group.main.id
-  role_definition_name = "Azure Kubernetes Service Cluster Admin Role"
+  role_definition_name = "Azure Kubernetes Service Cluster User Role"
   principal_id         = module.virtual_machine.vm_identity_principal_id
   skip_service_principal_aad_check = true
 }
@@ -234,26 +234,21 @@ resource "azurerm_private_endpoint" "key_vault" {
 }
 
 resource "null_resource" "copy_bastion_ip" {
+  triggers = {
+    public_ip = "${local.bastion_public_ip}"
+  }
+
+#On resource creation
   provisioner "local-exec" {
-    command = "echo '${local.bastion_public_ip}' >> ../infrastructure-addons/host-inventory"
+    command = "echo '${self.triggers.public_ip}' > ../infrastructure-addons/host-inventory && sed -i 's/@/@'${self.triggers.public_ip}'/' ansible.cfg"
+  }
+
+#On resource destruction
+  provisioner "local-exec" {
+    when = "destroy"
+    command = "truncate -s 0 ../infrastructure-addons/host-inventory && sed -i 's/@'${self.triggerspublic_ip}'/@/' ansible.cfg"
   }
 
   depends_on = [module.bastion_host]
-
-#Trigger the provisioner to run if there's a change to the bastion_host module
-  triggers = {
-    change = true
-  }
-}
-
-resource "null_resource" "cleanup" {
-  # Trigger the provisioner after infrastructure destruction
-  triggers = {
-    destroy = terraform.workspace == "default" ? timestamp() : null
-  }
-
-  provisioner "local-exec" {
-    command = "truncate -s 0 ../infrastructure-addons/host-inventory"
-  }
 }
 

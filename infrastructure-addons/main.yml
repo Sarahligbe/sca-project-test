@@ -1,0 +1,11 @@
+---
+# This runs the entire playbook
+
+- hosts: all
+  pre_tasks:
+    - name: update cache
+      apt:
+        update_cache: yes
+  roles:
+    - name: Configure the VM
+      role: aks-tools

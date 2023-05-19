@@ -1,0 +1,18 @@
+---
+
+# These tasks installs the basics like git and ufw, and ensures ufw is active
+
+
+- name: Install Azure CLI
+  shell: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+- name: Install Kubectl
+  shell: curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+- name: Install Helm v3
+  shell: sudo curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 &&
+         chmod 700 get_helm.sh && ./get_helm.sh
+
+- name: Get AKS cluster credentials
+  shell: az aks get-credentials --name scaProjectAKS --resource-group sca-project
+
