@@ -3,6 +3,7 @@ data "azurerm_client_config" "current" {
 
 locals {
   key_vault_private_dns_zone = "privatelink.vaultcore.azure.net"
+  bastion_public_ip = "${tostring(module.bastion_host.public_ip)}"
 }
 
 resource "azurerm_resource_group" "main" {
@@ -138,11 +139,6 @@ module "bastion_host" {
   location                     = var.location
   resource_group_name          = azurerm_resource_group.main.name
   subnet_id                    = module.hub_vnet.subnet_ids["AzureBastionSubnet"]
-
-#copy bation public ip to ansible host-inventory
-  provisioner "local-exec" {
-    command = "echo '${self.public_ip}' >> ../infrastructure-addons/host-inventory"
-  }
 }
 
 module "virtual_machine" {
@@ -234,6 +230,19 @@ resource "azurerm_private_endpoint" "key_vault" {
     ignore_changes = [
       tags
     ]
+  }
+}
+
+resource "null_resource" "copy_bastion_ip" {
+  provisioner "local-exec" {
+    command = "echo '${local.bastion_public_ip}' >> ../infrastructure-addons/host-inventory"
+  }
+
+  depends_on = [module.bastion_host]
+
+#Trigger the provisioner to run if there's a change to the bastion_host module
+  triggers = {
+    change = true
   }
 }
 
