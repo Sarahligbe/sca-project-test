@@ -138,6 +138,11 @@ module "bastion_host" {
   location                     = var.location
   resource_group_name          = azurerm_resource_group.main.name
   subnet_id                    = module.hub_vnet.subnet_ids["AzureBastionSubnet"]
+
+#copy bation public ip to ansible host-inventory
+  provisioner "local-exec" {
+    command = "echo '${self.public_ip}' >> ../infrastructure-addons/host-inventory"
+  }
 }
 
 module "virtual_machine" {
@@ -153,9 +158,9 @@ module "virtual_machine" {
   tags                                = var.tags
 }
 
-resource "azurerm_role_assignment" "virtual_machine_contributor" {
+resource "azurerm_role_assignment" "aks_cluster_admin" {
   scope                = azurerm_resource_group.main.id
-  role_definition_name = "Virtual Machine Contributor"
+  role_definition_name = "Azure Kubernetes Service Cluster Admin Role"
   principal_id         = module.virtual_machine.vm_identity_principal_id
   skip_service_principal_aad_check = true
 }
@@ -231,3 +236,15 @@ resource "azurerm_private_endpoint" "key_vault" {
     ]
   }
 }
+
+resource "null_resource" "cleanup" {
+  # Trigger the provisioner after infrastructure destruction
+  triggers = {
+    destroy = terraform.workspace == "default" ? timestamp() : null
+  }
+
+  provisioner "local-exec" {
+    command = "truncate -s 0 ../infrastructure-addons/host-inventory"
+  }
+}
+
