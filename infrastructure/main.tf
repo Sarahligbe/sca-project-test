@@ -4,6 +4,7 @@ data "azurerm_client_config" "current" {
 locals {
   key_vault_private_dns_zone = "privatelink.vaultcore.azure.net"
   vm_public_ip = "${tostring(module.virtual_machine.public_ip)}"
+  fw_public_ip = "${tostring(module.firewall.fw_public_ip)}"
 }
 
 resource "azurerm_resource_group" "main" {
@@ -152,12 +153,12 @@ module "virtual_machine" {
   dns_resource_group_name             = module.aks_cluster.node_resource_group
 }
 
-#resource "azurerm_role_assignment" "aks_cluster_admin" {
-#  scope                = azurerm_resource_group.main.id
-#  role_definition_name = "Azure Kubernetes Service Cluster User Role"
-#  principal_id         = module.virtual_machine.vm_identity_principal_id
-#  skip_service_principal_aad_check = true
-#}
+resource "azurerm_role_assignment" "aks_cluster_user" {
+  scope                = azurerm_resource_group.main.id
+  role_definition_name = "Azure Kubernetes Service Cluster User Role"
+  principal_id         = module.virtual_machine.vm_identity_principal_id
+  skip_service_principal_aad_check = true
+}
 
 module "key_vault" {
   source                          = "./modules/key_vault"
@@ -234,17 +235,18 @@ resource "azurerm_private_endpoint" "key_vault" {
 resource "null_resource" "copy_vm_ip" {
   triggers = {
     public_ip = "${local.vm_public_ip}"
+    fw_public_ip = "${local.fw_public_ip}"
   }
 
 #On resource creation
   provisioner "local-exec" {
-    command = "echo '${self.triggers.public_ip}' > ../infrastructure-addons/host-inventory && sed -i 's/@/@'${self.triggers.public_ip}'/' ../infrastructure-addons/ansible.cfg"
+    command = "echo '${self.triggers.public_ip}' > ../infrastructure-addons/host-inventory && sed -i 's/firewall_ip/firewall_ip: '${self.triggers.fw_public_ip}'/' > ../infrastructure-addons/group_vars/all/vars.yml"
   }
 
 #On resource destruction
   provisioner "local-exec" {
     when = destroy
-    command = "truncate -s 0 ../infrastructure-addons/host-inventory && sed -i 's/@'${self.triggers.public_ip}'/@/' ../infrastructure-addons/ansible.cfg"
+    command = "truncate -s 0 ../infrastructure-addons/host-inventory && sed -i 's/firewall_ip: '${self.triggers.fw_public_ip}'/firewall_ip/' > ../infrastructure-addons/group_vars/all/vars.yml"
   }
 
   depends_on = [module.virtual_machine]

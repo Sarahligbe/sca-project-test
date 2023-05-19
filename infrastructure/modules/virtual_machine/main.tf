@@ -63,19 +63,19 @@ resource "azurerm_network_interface_security_group_association" "nsg_association
   depends_on = [azurerm_network_security_group.nsg]
 }
 
-#resource "azurerm_user_assigned_identity" "vm_identity" {
-#  resource_group_name = var.resource_group_name
-#  location            = var.location
-#  tags                = var.tags
-#
-#  name = "${var.name}Identity"
-#
-#  lifecycle {
-#    ignore_changes = [
-#      tags
-#    ]
-#  }
-#}
+resource "azurerm_user_assigned_identity" "vm_identity" {
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  tags                = var.tags
+
+  name = "${var.name}Identity"
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
+}
 
 resource "azurerm_linux_virtual_machine" "main" {
   name                = var.name
@@ -105,10 +105,11 @@ resource "azurerm_linux_virtual_machine" "main" {
     version   = var.os_disk_image["version"]
   }
 
-#  identity {
-#    type = "UserAssigned"
-#    identity_ids = tolist([azurerm_user_assigned_identity.vm_identity.id])
-#  }
+#To be able to login to Azure CLI non-interactively
+  identity {
+    type = "UserAssigned"
+    identity_ids = tolist([azurerm_user_assigned_identity.vm_identity.id])
+  }
 
   depends_on = [
     azurerm_network_interface.nic,

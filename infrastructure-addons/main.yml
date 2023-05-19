@@ -9,3 +9,11 @@
   roles:
     - name: Configure the VM
       role: aks-tools
+    - name: Configure Nginx ingress controller
+      role: nginx-ingress-controller
+    - name: Configure DNS
+      role: dns
+    - name: Configure cert-manager
+      role: cert-manager
+    - name: Configure ArgoCD
+      role: argocd
