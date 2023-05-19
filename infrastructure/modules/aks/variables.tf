@@ -82,13 +82,13 @@ variable "http_application_routing_enabled" {
 
 variable "default_node_pool_name" {
   description = "Specifies the name of the default node pool"
-  default     =  "scaNP"
+  default     =  "scanode"
   type        = string
 }
 
 variable "default_node_pool_vm_size" {
   description = "Specifies the vm size of the default node pool"
-  default     = "Standard DC2s v2"
+  default     = "Standard_B2ms"
   type        = string
 }
 
@@ -128,12 +128,6 @@ variable "default_node_pool_node_count" {
   default       = 3
 }
 
-variable "default_node_pool_os_disk_type" {
-  description = "Specifies the type of disk which should be used for the Operating System."
-  type          = string
-  default       = "Ephemeral"
-}
-
 variable "admin_username" {
   description = "Specifies the Admin Username for the AKS cluster worker nodes."
   type        = string
@@ -167,4 +161,9 @@ variable "outbound_type" {
   description = "Specifies the outbound (egress) routing method which should be used for this Kubernetes Cluster."
   type        = string
   default     = "userDefinedRouting"
+}
+
+variable "vnet_subnet_id" {
+  description = "Specifies the subnet to create the node pool"
+  type = string
 }

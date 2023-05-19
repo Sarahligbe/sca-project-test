@@ -1,3 +1,13 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source = "hashicorp/azurerm"
+      version = "3.56.0"
+    }
+  }
+}
+
+
 resource "azurerm_user_assigned_identity" "aks_identity" {
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -37,7 +47,6 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     max_count               = var.default_node_pool_max_count
     min_count               = var.default_node_pool_min_count
     node_count              = var.default_node_pool_node_count
-    os_disk_type            = var.default_node_pool_os_disk_type
     tags                    = var.tags
   }
 
@@ -64,7 +73,7 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     ignore_changes = [
       kubernetes_version,
       tags,
-      node_count
+      default_node_pool[0].node_count
     ]
   }
 }

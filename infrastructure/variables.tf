@@ -33,6 +33,18 @@ variable "firewall_subnet_address_prefix" {
   type = list(string)
 }
 
+variable "route_table_name" {
+  description = "Specifies the name of the route table"
+  type = string
+  default = "scaRT"
+}
+
+variable "bastion_name" {
+  description = "Specifies the name of the bastion host"
+  type = string
+  default = "scaBastion"
+}
+
 variable "bastion_subnet_address_prefix" {
   description = "Specifies the address prefix of the bastion subnet"
   default = ["10.0.1.0/24"]
@@ -72,6 +84,7 @@ variable "public_ip_name" {
 variable "fw_name" {
   description = "Specifies the name of the firewall"
   type = string
+  default = "scaFW"
 }
 
 variable "fw_sku_name" {
@@ -149,7 +162,7 @@ variable "open_service_mesh_enabled" {
 variable "image_cleaner_enabled" {
   description = "Specifies whether Image Cleaner is enabled."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "azure_policy_enabled" {
@@ -166,13 +179,13 @@ variable "http_application_routing_enabled" {
 
 variable "default_node_pool_name" {
   description = "Specifies the name of the default node pool"
-  default     =  "scaNP"
+  default     =  "scanode"
   type        = string
 }
 
 variable "default_node_pool_vm_size" {
   description = "Specifies the vm size of the default node pool"
-  default     = "Standard DC2s v2"
+  default     = "Standard_B2ms"
   type        = string
 }
 
@@ -204,12 +217,6 @@ variable "default_node_pool_node_count" {
   description = "Specifies the initial number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be a value in the range min_count - max_count."
   type          = number
   default       = 3
-}
-
-variable "default_node_pool_os_disk_type" {
-  description = "Specifies the type of disk which should be used for the Operating System."
-  type          = string
-  default       = "Ephemeral"
 }
 
 variable "admin_username" {
@@ -247,12 +254,6 @@ variable "outbound_type" {
   default     = "userDefinedRouting"
 }
 
-variable "bastion_name" {
-  description = "Specifies the name of the bastion host"
-  type = string
-  default = "scaBastion"
-}
-
 variable "os_disk_size" {
   description = "Specifies the size of the VM operating system"
   type = string
@@ -264,9 +265,9 @@ variable "os_disk_image" {
   type        = map(string)
   default     = {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "20.04-LTS" 
-    version   = "latest"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2" 
+    version   = "20.04.202305150" 
   }
 }
 
@@ -276,3 +277,38 @@ variable "vm_name" {
   default = "scaVM"
 }
 
+variable "key_vault_name" {
+  description = "Specifies the name of the key vault"
+  type = string
+  default = "scaKV"
+}
+
+variable "key_vault_sku_name" {
+  description = "Specifies the Name of the SKU used for this Key Vault"
+  type        = string
+  default     = "standard"
+}
+
+variable "key_vault_soft_delete_retention_days" {
+  description = "Specifies the number of days that items should be retained for once soft-deleted. This value can be between 7 and 90 (the default) days."
+  type        = number
+  default     = 30
+}
+
+variable "key_vault_bypass" {
+  description = "Specifies which traffic can bypass the network rules. Possible values are AzureServices and None."
+  type        = string
+  default     = "AzureServices"
+}
+
+variable "key_vault_default_action" {
+  description = "Specifies the Default Action to use when no rules match from ip_rules / virtual_network_subnet_ids. Possible values are Allow and Deny."
+  type        = string
+  default     = "Allow"
+}
+
+variable "aks_cluster_name" {
+  description = "Name of the AKS cluster"
+  type = string
+  default = "scaProjectAKS"
+}

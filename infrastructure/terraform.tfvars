@@ -1,4 +1,4 @@
-rg_name = sca-project
+rg_name = "sca-project"
 tags = {
-  environment = sca-prod
+  "environment" = "sca-prod"
 }

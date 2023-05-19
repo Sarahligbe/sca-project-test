@@ -1,17 +1,17 @@
-resource "azurerm_virtual_network_peering" "from-hub" {
-  name                      = var.peering_name_hub
-  hub_resource_group_name       = var.resource_group_name
-  virtual_network_name      = var.hub_vnet_name
-  remote_virtual_network_id = var.aks_vnet_id
+resource "azurerm_virtual_network_peering" "peering" {
+  name                      = var.peering_name_1_to_2
+  resource_group_name       = var.vnet_1_resource_group_name
+  virtual_network_name      = var.vnet_1_name
+  remote_virtual_network_id = var.vnet_2_id
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
 }
 
-resource "azurerm_virtual_network_peering" "to-hub" {
-  name                      = var.peering_name_aks
-  aks_resource_group_name       = var.resource_group_name
-  virtual_network_name      = var.aks_vnet_name
-  remote_virtual_network_id = var.hub_vnet_id
+resource "azurerm_virtual_network_peering" "peering-back" {
+  name                      = var.peering_name_2_to_1
+  resource_group_name       = var.vnet_2_resource_group_name
+  virtual_network_name      = var.vnet_2_name
+  remote_virtual_network_id = var.vnet_1_id
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
 }

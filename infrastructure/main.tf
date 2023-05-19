@@ -12,12 +12,12 @@ resource "azurerm_resource_group" "main" {
 
 module "hub_vnet" {
   source = "./modules/vnet"
-  resource_group_name = azurerm_resource_group.main
+  resource_group_name = azurerm_resource_group.main.name
   location = var.location
   vnet_name = var.hub_vnet
   address_space = var.hub_address_space
   
-  subnet = [
+  subnets = [
     {
       name : "AzureFirewallSubnet"
       address_prefixes : var.firewall_subnet_address_prefix
@@ -34,12 +34,12 @@ module "hub_vnet" {
 
 module "aks_vnet" {
   source = "./modules/vnet"
-  resource_group_name = azurerm_resource_group.main
+  resource_group_name = azurerm_resource_group.main.name
   location = var.location
   vnet_name = var.aks_vnet
   address_space = var.aks_address_space
   
-  subnet = [
+  subnets = [
     {
       name : "aksNodePoolSubnet"
       address_prefixes : var.aks_subnet_address_prefix
@@ -56,14 +56,14 @@ module "aks_vnet" {
 
 module "vnet_peering" {
   source = "./modules/vnet_peering"
-  hub_vnet_name         = var.hub_vnet
-  hub_vnet_id           = module.hub_vnet.vnet_id
-  hub_resource_group_name           = azurerm_resource_group.main.name
-  aks_vnet_name         = var.aks_vnet
-  aks_vnet_id           = module.aks_vnet.vnet_id
-  aks_resource_group_name           = azurerm_resource_group.main.name
-  peering_name_hub = "${var.hub_vnet_name}to${var.aks_vnet_name}"
-  peering_name_spoke = "${var.aks_vnet_name}to${var.hub_vnet_name}"
+  vnet_1_name         = var.hub_vnet
+  vnet_1_id           = module.hub_vnet.vnet_id
+  vnet_1_resource_group_name           = azurerm_resource_group.main.name
+  vnet_2_name         = var.aks_vnet
+  vnet_2_id           = module.aks_vnet.vnet_id
+  vnet_2_resource_group_name           = azurerm_resource_group.main.name
+  peering_name_1_to_2 = "${var.hub_vnet}to${var.aks_vnet}"
+  peering_name_2_to_1 = "${var.aks_vnet}to${var.hub_vnet}"
 }
 
 module "firewall" {
@@ -85,9 +85,9 @@ module "routetable" {
   resource_group_name  = azurerm_resource_group.main.name
   location             = var.location
   route_table_name     = var.route_table_name
-  route_name           = var.route_name
   firewall_private_ip  = module.firewall.private_ip_address
-  subnet_id = module.aks_vnet.subnet_ids["aksNodePoolSubnet"]
+  subnet_id            = module.aks_vnet.subnet_ids["aksNodePoolSubnet"]
+  tags                 = var.tags
 }
 
 module "aks_cluster" {
@@ -95,7 +95,6 @@ module "aks_cluster" {
   name                                     = var.aks_cluster_name
   location                                 = var.location
   resource_group_name                      = azurerm_resource_group.main.name
-  resource_group_id                        = azurerm_resource_group.main.id
   kubernetes_version                       = var.kubernetes_version
   dns_prefix                               = var.dns_prefix
   private_cluster_enabled                  = true
@@ -109,7 +108,6 @@ module "aks_cluster" {
   default_node_pool_max_count              = var.default_node_pool_max_count
   default_node_pool_min_count              = var.default_node_pool_min_count
   default_node_pool_node_count             = var.default_node_pool_node_count
-  default_node_pool_os_disk_type           = var.default_node_pool_os_disk_type
   network_dns_service_ip                   = var.network_dns_service_ip
   network_plugin                           = var.network_plugin
   outbound_type                            = "userDefinedRouting"
@@ -135,8 +133,8 @@ resource "azurerm_role_assignment" "network_contributor" {
 }
 
 module "bastion_host" {
-  source                       = "./modules/bastion_host"
-  bastion_name                 = var.bastion_host_name
+  source                       = "./modules/bastion"
+  bastion_name                 = var.bastion_name
   location                     = var.location
   resource_group_name          = azurerm_resource_group.main.name
   subnet_id                    = module.hub_vnet.subnet_ids["AzureBastionSubnet"]
@@ -145,15 +143,13 @@ module "bastion_host" {
 module "virtual_machine" {
   source                              = "./modules/virtual_machine"
   name                                = var.vm_name
-  size                                = var.vm_size
   location                            = var.location
   vm_user                             = var.admin_username
   ssh_public_key                      = var.ssh_public_key
   os_disk_size                        = var.os_disk_size
-  os_disk_image                       = var.vm_os_disk_image
+  os_disk_image                       = var.os_disk_image
   resource_group_name                 = azurerm_resource_group.main.name
   subnet_id                           = module.aks_vnet.subnet_ids["azureVMSubnet"]
-  os_disk_storage_account_type        = var.vm_os_disk_storage_account_type
   tags                                = var.tags
 }
 
@@ -172,8 +168,8 @@ module "key_vault" {
 }
 
 resource "azurerm_private_dns_zone" "key_vault" {
-  name = var.key_vault_private_dns_zone_name
-  resorce_group_name = azurerm_resource_group.main.name
+  name = local.key_vault_private_dns_zone
+  resource_group_name = azurerm_resource_group.main.name
   tags                = var.tags
 
   lifecycle {
@@ -185,14 +181,42 @@ resource "azurerm_private_dns_zone" "key_vault" {
 
 resource "azurerm_private_dns_zone_virtual_network_link" "key_vault" {
   for_each = {
-    module.hub_vnet.vnet_name = module.hub_vnet.vnet_id
-    module.aks_vnet.vnet_name = module.aks_vnet.vnet_id
+    (module.hub_vnet.vnet_name) = (module.hub_vnet.vnet_id)
+    (module.aks_vnet.vnet_name) = (module.aks_vnet.vnet_id)
   }
 
   name                  = "link_to_${lower(basename(each.key))}"
-  resource_group_name   = var.resource_group_name
-  private_dns_zone_name = azurerm_private_dns_zone.key_vault.name
-  virtual_network_id    = each.value
+  resource_group_name   = azurerm_resource_group.main.name
+  private_dns_zone_name = local.key_vault_private_dns_zone
+  virtual_network_id    = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${azurerm_resource_group.main.name}/providers/Microsoft.Network/virtualNetworks/${each.key}"
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
+
+  depends_on = [azurerm_private_dns_zone.key_vault]
+}
+
+resource "azurerm_private_endpoint" "key_vault" {
+  name                = "${title(module.key_vault.name)}PrivateEndpoint"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.main.name
+  subnet_id           = module.aks_vnet.subnet_ids["azureVMSubnet"]
+  tags                = var.tags
+
+  private_service_connection {
+    name                           = "kvPrivateEndpointConnection"
+    private_connection_resource_id = module.key_vault.id
+    is_manual_connection           = false
+    subresource_names              = ["vault"]
+  }
+
+  private_dns_zone_group {
+    name                 = "KeyVaultPrivateDnsZoneGroup"
+    private_dns_zone_ids = [azurerm_private_dns_zone.key_vault.id]
+  }
 
   lifecycle {
     ignore_changes = [

@@ -47,8 +47,9 @@ variable "os_disk_image" {
   type        = map(string)
   default     = {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "20.04-LTS" 
-    version   = "latest"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2"
+    version   = "20.04.202305150"
+
   }
 }
