@@ -245,13 +245,13 @@ resource "null_resource" "copy_vm_ip" {
 
 #On resource creation
   provisioner "local-exec" {
-    command = "echo '${self.triggers.public_ip}' > ../infrastructure-addons/host-inventory && sed -i 's/firewall_ip/firewall_ip: '${self.triggers.fw_public_ip}'/' ../infrastructure-addons/group_vars/all/vars.yml"
+    command = "echo '${self.triggers.public_ip}' > ../infrastructure-addons/host-inventory && sed -i 's/firewall_ip:/firewall_ip: '${self.triggers.fw_public_ip}'/' ../infrastructure-addons/group_vars/all/vars.yml"
   }
 
 #On resource destruction
   provisioner "local-exec" {
     when = destroy
-    command = "truncate -s 0 ../infrastructure-addons/host-inventory && sed -i 's/firewall_ip: '${self.triggers.fw_public_ip}'/firewall_ip/' ../infrastructure-addons/group_vars/all/vars.yml"
+    command = "truncate -s 0 ../infrastructure-addons/host-inventory && sed -i 's/firewall_ip: '${self.triggers.fw_public_ip}'/firewall_ip:/' ../infrastructure-addons/group_vars/all/vars.yml"
   }
 
   depends_on = [module.virtual_machine]
