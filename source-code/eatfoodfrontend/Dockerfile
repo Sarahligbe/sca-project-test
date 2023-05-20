@@ -6,7 +6,7 @@ COPY package*.json /app/frontend/
 
 RUN npm install 
 
-RUN npm i -g react-scripts
+RUN npm i -g react-scripts@3.4.1
 
 COPY . /app/frontend/
 

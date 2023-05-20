@@ -69,7 +69,7 @@ variable "aks_subnet_address_prefix" {
   type = list(string)
 }
 
-variable "aks_subnet_address_prefix" {
+variable "ing_subnet_address_prefix" {
   description = "Specifies the address prefix of the ingress subnet"
   default = ["10.1.32.0/20"]
   type = list(string)
