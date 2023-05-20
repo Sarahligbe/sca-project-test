@@ -334,3 +334,9 @@ variable "dns_rg" {
   description = "Specifies the resource group your domain was created in"
   type = string
 }
+
+variable "log_analytics_retention_days" {
+  description = "Specifies the number of days of the retention policy"
+  type        = number
+  default     = 7
+}

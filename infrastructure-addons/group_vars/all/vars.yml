@@ -6,8 +6,7 @@
 domain: "sarahaligbe.me"
 email: "{{ vault_email }}"
 slack_token: "{{ vault_slack_token }}"
-argocd_password: "{{ vault_argocd_password }}"
-#firewall_ip  
+argocd_password: "{{ vault_argocd_password }}"  
 app_subdomain: "eatfood"
 argocd_subdomain: "argocd"
 ingress_chart_version: "4.5.2"
@@ -15,3 +14,5 @@ argocd_chart_version: "5.27.0"
 cert_manager_chart_version: "v1.11.0"
 git_repo: "https://github.com/Sarahligbe/sca-project-test.git"
 ingress_ip: '10.1.32.17'
+subscription_id: "{{ vault_subscription_id }}"
+resource_group_name: "sca-project"

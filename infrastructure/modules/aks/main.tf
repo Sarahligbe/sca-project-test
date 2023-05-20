@@ -57,6 +57,11 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     }
   }
 
+  oms_agent {
+    msi_auth_for_monitoring_enabled = true
+    log_analytics_workspace_id      = coalesce(var.oms_agent.log_analytics_workspace_id, var.log_analytics_workspace_id)
+  }
+
   identity {
     type = "UserAssigned"
     identity_ids = tolist([azurerm_user_assigned_identity.aks_identity.id])

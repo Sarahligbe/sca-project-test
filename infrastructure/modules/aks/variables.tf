@@ -116,6 +116,23 @@ variable "default_node_pool_max_count" {
   default       = 10
 }
 
+variable "log_analytics_workspace_id" {
+  description = "The ID of the Log Analytics Workspace which the OMS Agent should send data to."
+  type        = string
+}
+
+variable "oms_agent" {
+  description = "Specifies the OMS agent addon configuration."
+  type        = object({
+    enabled                     = bool           
+    log_analytics_workspace_id  = string
+  })
+  default     = {
+    enabled                     = true
+    log_analytics_workspace_id  = null
+  }
+}
+
 variable "default_node_pool_min_count" {
   description = "Specifies the minimum number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be less than or equal to max_count."
   type          = number

@@ -5,15 +5,14 @@ metadata:
   namespace: argocd
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
-    kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - "argocd.{{ domain }}"
-      secretName: wildcard-cert
+        - "*.{{ domain }}"
+      secretName: cluster-cert
   rules:
     - host: "argocd.{{ domain }}"
       http:

@@ -10,6 +10,11 @@ output "id" {
 
 output "aks_identity_principal_id" {
   value       = azurerm_user_assigned_identity.aks_identity.principal_id
+  description = "Specifies the OIDC issuer URL associated with the AKS cluster."
+}
+
+output "oidc_issuer_url" {
+  value       = azurerm_kubernetes_cluster.aks_cluster.oidc_issuer_url
   description = "Specifies the principal id of the managed identity of the AKS cluster."
 }
 

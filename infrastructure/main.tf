@@ -15,15 +15,20 @@ locals {
   vm_public_ip = "${tostring(module.virtual_machine.public_ip)}"
   fw_public_ip = "${tostring(module.firewall.fw_public_ip)}"
 
-  subdomains = {
-    webdomain = "eatfood${var.domain}"
-    argodomain = "argocd${var.domain}"
-  }
+  cert_manager_namespace = "cert-manager"
+  cert_manager_service_account = "cert-manager"
 }
 
 resource "azurerm_resource_group" "main" {
   name = var.rg_name
   location = var.location
+}
+
+module "log_analytics_workspace" {
+  source                           = "./modules/log_analytics_workspace"
+  name                             = var.log_analytics_workspace_name
+  location                         = var.location
+  resource_group_name              = azurerm_resource_group.main.name
 }
 
 module "hub_vnet" {
@@ -32,6 +37,8 @@ module "hub_vnet" {
   location = var.location
   vnet_name = var.hub_vnet
   address_space = var.hub_address_space
+  log_analytics_workspace_id   = module.log_analytics_workspace.id
+  log_analytics_retention_days = var.log_analytics_retention_days
   
   subnets = [
     {
@@ -54,6 +61,8 @@ module "aks_vnet" {
   location = var.location
   vnet_name = var.aks_vnet
   address_space = var.aks_address_space
+  log_analytics_workspace_id   = module.log_analytics_workspace.id
+  log_analytics_retention_days = var.log_analytics_retention_days
   
   subnets = [
     {
@@ -94,7 +103,9 @@ module "firewall" {
   public_ip_name               = var.public_ip_name
   subnet_id                    = module.hub_vnet.subnet_ids["AzureFirewallSubnet"]
   tags                         = var.tags
-  ingress_ip                   = var.ingress_ip 
+  ingress_ip                   = var.ingress_ip
+  log_analytics_workspace_id   = module.log_analytics_workspace.id
+  log_analytics_retention_days = var.log_analytics_retention_days 
 }
 
 resource "azurerm_dns_a_record" "main" {
@@ -137,6 +148,7 @@ module "aks_cluster" {
   default_node_pool_node_count             = var.default_node_pool_node_count
   network_dns_service_ip                   = var.network_dns_service_ip
   network_plugin                           = var.network_plugin
+  log_analytics_workspace_id               = module.log_analytics_workspace.id
   outbound_type                            = "userDefinedRouting"
   network_service_cidr                     = var.network_service_cidr
   admin_username                           = var.admin_username
@@ -159,13 +171,28 @@ resource "azurerm_role_assignment" "network_contributor" {
   skip_service_principal_aad_check = true
 }
 
-#module "bastion_host" {
-#  source                       = "./modules/bastion"
-#  bastion_name                 = var.bastion_name
-#  location                     = var.location
-#  resource_group_name          = azurerm_resource_group.main.name
-#  subnet_id                    = module.hub_vnet.subnet_ids["AzureBastionSubnet"]
-#}
+#User identity for cert-manager dns01 solver
+resource "azurerm_user_assigned_identity" "cert-manager" {
+  location            = azurerm_resource_group.main.location
+  name                = "cert-manager"
+  resource_group_name = azurerm_resource_group.main.name
+}
+
+resource "azurerm_role_assignment" "network_contributor" {
+  scope                = data.azurerm_subscription.current.id
+  role_definition_name = "DNS Contributor"
+  principal_id         = azurerm_user_assigned_identity.cert-manager.principal_id
+  skip_service_principal_aad_check = true
+}
+
+resource "azurerm_federated_identity_credential" "cert-manager" {
+  name                = "cert-manager"
+  resource_group_name = azurerm_resource_group.main.name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = module.aks_cluster.oidc_issuer_url
+  parent_id           = azurerm_user_assigned_identity.cert-manager.id
+  subject             = "system:serviceaccount:${local.cert_manager_namespace}:${local.cert_manager_service_account}"
+}
 
 module "virtual_machine" {
   source                              = "./modules/virtual_machine"
@@ -272,13 +299,13 @@ resource "null_resource" "copy_vm_ip" {
 
 #On resource creation
   provisioner "local-exec" {
-    command = "echo '${self.triggers.public_ip}' > ../infrastructure-addons/host-inventory && sed -i 's/firewall_ip:/firewall_ip: '${self.triggers.fw_public_ip}'/' ../infrastructure-addons/group_vars/all/vars.yml"
+    command = "echo '${self.triggers.public_ip}' > ../infrastructure-addons/host-inventory" 
   }
 
 #On resource destruction
   provisioner "local-exec" {
     when = destroy
-    command = "truncate -s 0 ../infrastructure-addons/host-inventory && sed -i 's/firewall_ip: '${self.triggers.fw_public_ip}'/firewall_ip:/' ../infrastructure-addons/group_vars/all/vars.yml"
+    command = "truncate -s 0 ../infrastructure-addons/host-inventory"
   }
 
   depends_on = [module.virtual_machine]

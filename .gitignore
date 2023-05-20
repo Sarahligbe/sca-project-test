@@ -2,7 +2,7 @@
 **/.terraform/*
 
 infrastructure/modules/bastion/
-infrastructure-addons/roles/dns
+infrastructure-addons/roles/dns/
 
 # .tfstate files
 *.tfstate
