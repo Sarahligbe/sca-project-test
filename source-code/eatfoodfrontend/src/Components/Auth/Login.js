@@ -29,7 +29,7 @@ export default function Login(props){
                 password : password,
             })
         }
-        fetch('http://46.101.19.75:8000/api/login', requestOptions)
+        fetch('http://127.0.0.1:8000/api/login', requestOptions)
         .then(response => {
             if(response.ok){
                 setloginState(true)

@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:13.12.0-alpine
 
 WORKDIR /app/frontend
 
@@ -10,8 +10,6 @@ RUN npm i -g react-scripts
 
 COPY . /app/frontend/
 
-RUN chown -R node /app/frontend/node_modules
-
-USER node
+EXPOSE 3000
 
 CMD [ "npm", "start" ]
