@@ -10,7 +10,7 @@
     name: "argo-cd"
     chart_ref: "argo/argo-cd"
     chart_version: "{{ argocd_chart_version }}"
-    values: "{{ lookup('template', 'template/values.yaml.j2') | from_yaml }}"
+    values: "{{ lookup('template', 'templates/values.yaml.j2') | from_yaml }}"
     release_namespace: "argocd"
     create_namespace: true
 
