@@ -215,4 +215,29 @@ resource "azurerm_firewall_policy_rule_collection_group" "policies" {
       network_rule_collection
     ]
   }
+
+  nat_rule_collection {
+    name     = "nat_rule_collection"
+    priority = 300
+    action   = "Dnat"
+    rule {
+      name                = "nat_rule_collection_rule_https"
+      protocols           = ["TCP"]
+      source_addresses    = ["*"]
+      destination_address = azurerm_public_ip.public_ip.ip_address
+      destination_ports   = ["443"]
+      translated_address  = var.ingress_ip
+      translated_port     = "443"
+    }
+
+    rule {
+      name                = "nat_rule_collection_rule_http"
+      protocols           = ["TCP"]
+      source_addresses    = ["*"]
+      destination_address = azurerm_public_ip.public_ip.ip_address
+      destination_ports   = ["80"]
+      translated_address  = var.ingress_ip
+      translated_port     = "80"
+    }
+  }
 }

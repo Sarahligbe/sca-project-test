@@ -52,3 +52,8 @@ variable "subnet_id" {
   description = "References the subnet ID associated with the IP config"
   type = string
 }
+
+variable "ingress_ip" {
+  description = "Private IP address of to use for the ingress. Selected from the ingress subnet"
+  type = string
+}

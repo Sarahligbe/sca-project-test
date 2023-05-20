@@ -75,6 +75,12 @@ variable "ing_subnet_address_prefix" {
   type = list(string)
 }
 
+variable "ingress_ip" {
+  description = "Private IP address of to use for the ingress. Selected from the ingress subnet"
+  type = string
+  default = "10.1.32.17"
+}
+
 variable "vm_subnet_address_prefix" {
   description = "Specifies the address prefix of the virtual machine subnet"
   default = ["10.0.1.0/24"]
@@ -317,4 +323,14 @@ variable "aks_cluster_name" {
   description = "Name of the AKS cluster"
   type = string
   default = "scaProjectAKS"
+}
+
+variable "domain" {
+  description = "Specifies your domain name"
+  type = string
+}
+
+variable "dns_rg" {
+  description = "Specifies the resource group your domain was created in"
+  type = string
 }

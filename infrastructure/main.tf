@@ -1,10 +1,24 @@
 data "azurerm_client_config" "current" {
 }
 
+data "azurerm_dns_zone" "main" {
+  name                = var.domain
+  resource_group_name = var.dns_rg
+}
+
+output "dns_zone_id" {
+  value = data.azurerm_dns_zone.main.id
+}
+
 locals {
   key_vault_private_dns_zone = "privatelink.vaultcore.azure.net"
   vm_public_ip = "${tostring(module.virtual_machine.public_ip)}"
   fw_public_ip = "${tostring(module.firewall.fw_public_ip)}"
+
+  subdomains = {
+    webdomain = "eatfood${var.domain}"
+    argodomain = "argocd${var.domain}"
+  }
 }
 
 resource "azurerm_resource_group" "main" {
@@ -80,6 +94,17 @@ module "firewall" {
   public_ip_name               = var.public_ip_name
   subnet_id                    = module.hub_vnet.subnet_ids["AzureFirewallSubnet"]
   tags                         = var.tags
+  ingress_ip                   = var.ingress_ip 
+}
+
+resource "azurerm_dns_a_record" "main" {
+  for_each = local.subdomains
+
+  name                = each.value
+  zone_name           = azurerm_dns_zone.example.name
+  resource_group_name = azurerm_resource_group.example.name
+  ttl                 = 300
+  records             = [module.firewall.fw_public_ip]
 }
 
 module "routetable" {
@@ -236,6 +261,8 @@ resource "azurerm_private_endpoint" "key_vault" {
     ]
   }
 }
+
+
 
 resource "null_resource" "copy_vm_ip" {
   triggers = {
