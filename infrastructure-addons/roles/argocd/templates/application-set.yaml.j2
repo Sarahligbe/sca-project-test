@@ -3,6 +3,7 @@ kind: ApplicationSet
 metadata:
   name: sca-project
   namespace: argocd
+{% raw %}
 spec: 
   generators: 
     - git: 
@@ -34,3 +35,4 @@ spec:
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
+{% endraw %}

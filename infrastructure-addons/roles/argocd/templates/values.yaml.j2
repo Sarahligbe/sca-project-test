@@ -7,16 +7,17 @@ notifications:
   argocdURL: "argocd.{{ domain }}"
   secret:
     items:
-      slack-token: {{ slack_token }}
+      slack-token: "{{ slack_token }}"
   logFormat: "json"
   logLevel: "info"
   notifiers: 
     service.slack: |
       token: $slack-token
+{% raw %}
   templates:
     template.app-deployed: |
       message: |
-        Application {{.app.metadata.name}} sync is {{.app.status.sync.status}}.
+        Application {{.app.metadata.name}}  sync is {{.app.status.sync.status}}.
         Application details: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}.
       slack:
          attachments: |
@@ -211,6 +212,7 @@ notifications:
              {{end}}
              ]
            }]
+{% endraw %}
   triggers:
     trigger.on-deployed: |
       - description: Application is synced and healthy. Triggered once per commit.
