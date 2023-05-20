@@ -101,8 +101,8 @@ resource "azurerm_dns_a_record" "main" {
   for_each = local.subdomains
 
   name                = each.value
-  zone_name           = azurerm_dns_zone.example.name
-  resource_group_name = azurerm_resource_group.example.name
+  zone_name           = var.domain
+  resource_group_name = var.dns_rg
   ttl                 = 300
   records             = [module.firewall.fw_public_ip]
 }
