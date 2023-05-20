@@ -9,12 +9,10 @@
   kubernetes.core.helm:
     name: "cert-manager"
     chart_ref: "cert-manager/cert-manager"
-    chart_version: "{{ cert-manager_chart_version }}"
+    chart_version: "{{ cert_manager_chart_version }}"
     release_namespace: "cert-manager"
     create_namespace: true
-    set_values: 
-      - value: installCRDs=true
-        value_type: string
+    values: "{{ lookup('template', 'templates/values.yaml.j2') | from_yaml }}"
 
 - name: kubectl apply clusterissuer
   kubernetes.core.k8s:
