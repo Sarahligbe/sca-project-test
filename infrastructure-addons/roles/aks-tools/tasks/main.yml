@@ -21,4 +21,3 @@
 
 - name: Install AKS preview CLI extensions
   shell: az extension add --name aks-preview
-

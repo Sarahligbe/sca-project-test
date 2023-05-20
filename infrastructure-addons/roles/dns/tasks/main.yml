@@ -17,7 +17,7 @@
               - '443'
             protocols:
               - tcp
-            translated_address: '{{ ingress_ip }}'
+            translated_address: '10.1.0.152'
             translated_port: '443'
           - name: DNAT-HTTP-traffic
             description: D-NAT all outbound web traffic for inspection
@@ -29,9 +29,10 @@
               - '80'
             protocols:
               - tcp
-            translated_address: '{{ ingress_ip }}'
+            translated_address: '10.1.0.152'
             translated_port: '80'
         name: natrulecoll
+  delegate_to: localhost
 
 - name: createCNAME record
   azure_rm_dnsrecordset:
@@ -43,3 +44,4 @@
   loop:
       - {subdomain: '{{ app_subdomain }}', record_type: 'A'}
       - {subdomain: '{{ argocd_subdomain }}', record_type: 'A'}
+  delegate_to: localhost
