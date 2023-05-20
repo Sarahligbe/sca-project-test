@@ -45,6 +45,11 @@ module "aks_vnet" {
     {
       name : "aksNodePoolSubnet"
       address_prefixes : var.aks_subnet_address_prefix
+    },
+
+    {
+      name : "ingNodePoolSubnet"
+      address_prefixes : var.ing_subnet_address_prefix
     }
   ]
 

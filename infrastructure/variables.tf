@@ -64,13 +64,19 @@ variable "aks_address_space" {
 }
 
 variable "aks_subnet_address_prefix" {
-  description = "Specifies the address prefix of the firewall subnet"
+  description = "Specifies the address prefix of the aks subnet"
   default = ["10.1.0.0/20"]
   type = list(string)
 }
 
+variable "aks_subnet_address_prefix" {
+  description = "Specifies the address prefix of the ingress subnet"
+  default = ["10.1.32.0/20"]
+  type = list(string)
+}
+
 variable "vm_subnet_address_prefix" {
-  description = "Specifies the address prefix of the bastion subnet"
+  description = "Specifies the address prefix of the virtual machine subnet"
   default = ["10.0.1.0/24"]
   type = list(string)
 }
