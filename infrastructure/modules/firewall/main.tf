@@ -200,13 +200,13 @@ resource "azurerm_firewall_policy_rule_collection_group" "policies" {
       protocols             = ["Any"]
     }
 
-#    rule {
-#      name                  = "Internet"
-#      source_addresses      = ["*"]
-#      destination_ports     = ["*"]
-#      destination_addresses = ["*"]
-#      protocols             = ["TCP"]
-#    }
+    rule {
+      name                  = "Internet"
+      source_addresses      = ["*"]
+      destination_ports     = ["*"]
+      destination_addresses = ["*"]
+      protocols             = ["TCP"]
+    }
   }
 
   lifecycle {
