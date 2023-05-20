@@ -340,3 +340,9 @@ variable "log_analytics_retention_days" {
   type        = number
   default     = 7
 }
+
+variable "log_analytics_workspace_name" {
+  description = "Specifies the name of the log analytics workspace"
+  type = string
+  default = "project"
+}

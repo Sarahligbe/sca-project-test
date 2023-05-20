@@ -1,6 +1,9 @@
 data "azurerm_client_config" "current" {
 }
 
+data "azurerm_subscription" "current" {
+}
+
 data "azurerm_dns_zone" "main" {
   name                = var.domain
   resource_group_name = var.dns_rg
@@ -109,9 +112,7 @@ module "firewall" {
 }
 
 resource "azurerm_dns_a_record" "main" {
-  for_each = local.subdomains
-
-  name                = each.value
+  name                = "*"
   zone_name           = var.domain
   resource_group_name = var.dns_rg
   ttl                 = 300
