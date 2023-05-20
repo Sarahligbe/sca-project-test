@@ -9,7 +9,7 @@
   kubernetes.core.helm:
     name: "nginx-ingress"
     chart_ref: "ingress-nginx/ingress-nginx"
-    chart_version: "ingress_chart_version"
+    chart_version: "{{ ingress_chart_version }}"
     values: "{{ lookup('template', 'templates/values.yaml.j2') | from_yaml }}"
     release_namespace: "nginx-ingress"
     create_namespace: true
