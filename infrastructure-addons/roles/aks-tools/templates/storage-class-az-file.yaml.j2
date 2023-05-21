@@ -5,8 +5,7 @@ metadata:
 provisioner: file.csi.azure.com
 allowVolumeExpansion: true
 parameters:
-  storageAccount: "scapvcsa"
-  server: scapvcsa.privatelink.file.core.windows.net 
+  skuName: Standard_LRS 
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
 mountOptions:

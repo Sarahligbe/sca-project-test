@@ -31,7 +31,7 @@
   shell: export USER_ASSIGNED_IDENTITY_CLIENT_ID=$(az identity show --name "cert-manager" --resource-group "sca-project" --query 'clientId' -o tsv) > /dev/null
 
 - name: Install azure-file-csi driver
-  shell: curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azurefile-csi-driver/v1.1.0/deploy/install-driver.sh | bash -s v1.1.0 --
+  shell: curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azurefile-csi-driver/v1.1.0/deploy/install-driver.sh | bash -s v1.5.0 --
 
 - name: Install AKS preview CLI extensions
   shell: az extension add --name aks-preview
