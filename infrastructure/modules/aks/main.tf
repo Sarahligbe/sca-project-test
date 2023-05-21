@@ -67,6 +67,10 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     identity_ids = tolist([azurerm_user_assigned_identity.aks_identity.id])
   }
 
+  key_vault_secrets_provider {
+    secret_rotation_enabled = true
+  }
+
   network_profile {
     dns_service_ip     = var.network_dns_service_ip
     network_plugin     = var.network_plugin

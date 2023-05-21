@@ -42,11 +42,11 @@ resource "azurerm_firewall_policy" "policy" {
 resource "azurerm_firewall_policy_rule_collection_group" "policies" {
   name               = "AksEgressPolicyRuleCollectionGroup"
   firewall_policy_id = azurerm_firewall_policy.policy.id
-  priority           = 500
+  priority           = 100
 
   application_rule_collection {
     name     = "ApplicationRules"
-    priority = 500
+    priority = 300
     action   = "Allow"
 
     rule {
@@ -169,9 +169,17 @@ resource "azurerm_firewall_policy_rule_collection_group" "policies" {
 
   network_rule_collection {
     name     = "NetworkRules"
-    priority = 400
+    priority = 200
     action   = "Allow"
 
+    rule {
+      name                  = "Internet"
+      source_addresses      = ["*"]
+      destination_ports     = ["*"]
+      destination_addresses = ["*"]
+      protocols             = ["TCP"]
+    }
+    
     rule {
       name                  = "Time"
       source_addresses      = ["*"]
@@ -199,26 +207,11 @@ resource "azurerm_firewall_policy_rule_collection_group" "policies" {
       ]
       protocols             = ["Any"]
     }
-
-    rule {
-      name                  = "Internet"
-      source_addresses      = ["*"]
-      destination_ports     = ["*"]
-      destination_addresses = ["*"]
-      protocols             = ["TCP"]
-    }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      application_rule_collection,
-      network_rule_collection
-    ]
   }
 
   nat_rule_collection {
     name     = "nat_rule_collection"
-    priority = 300
+    priority = 100
     action   = "Dnat"
     rule {
       name                = "nat_rule_collection_rule_https"
@@ -239,6 +232,14 @@ resource "azurerm_firewall_policy_rule_collection_group" "policies" {
       translated_address  = var.ingress_ip
       translated_port     = "80"
     }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      application_rule_collection,
+      network_rule_collection,
+      nat_rule_collection
+    ]
   }
 }
 

@@ -24,3 +24,9 @@ variable "tags" {
   type        = map
   default     = {}
 }
+
+variable "solution_plan_map" {
+  description = "Specifies the map structure containing the list of solutions to be enabled."
+  type        = map(any)
+  default     = {}
+}
