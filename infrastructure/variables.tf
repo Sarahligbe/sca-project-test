@@ -75,6 +75,12 @@ variable "ing_subnet_address_prefix" {
   type = list(string)
 }
 
+variable "priv_subnet_address_prefix" {
+  description = "Specifies the address prefix of the private endpoints subnet"
+  default = ["10.1.64.0/20"]
+  type = list(string)
+}
+
 variable "ingress_ip" {
   description = "Private IP address of to use for the ingress. Selected from the ingress subnet"
   type = string
