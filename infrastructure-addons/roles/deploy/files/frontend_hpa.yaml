@@ -1,7 +1,8 @@
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: client-deployment
+  namespace: project
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

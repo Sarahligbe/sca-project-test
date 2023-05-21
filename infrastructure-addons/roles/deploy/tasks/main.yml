@@ -1,16 +1,23 @@
-- name: kubectl apply storage class
+- name: Create a k8s namespace
+  kubernetes.core.k8s:
+    name: project
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: kubectl apply project
   kubernetes.core.k8s:
     state: present
-    definition: 
-    loop:
-      - "{{ lookup('file', 'files/frontend.yaml') | from_yaml }}"
-      - "{{ lookup('file', 'files/dbsec.yaml') | from_yaml }}"
-      - "{{ lookup('file', 'files/backend.yaml') | from_yaml }}"
-      - "{{ lookup('file', 'files/frontend_service.yaml') | from_yaml }}"
-      - "{{ lookup('file', 'files/backend_service.yaml') | from_yaml }}"
-      - "{{ lookup('file', 'files/database_pvc.yaml') | from_yaml }}"
-      - "{{ lookup('file', 'files/postgres.yaml') | from_yaml }}"
-      - "{{ lookup('file', 'files/postgres_service.yaml') | from_yaml }}"
-      - "{{ lookup('file', 'files/ingress.yaml') | from_yaml }}"
-      - "{{ lookup('file', 'files/frontend_hpa.yaml') | from_yaml }}"
-      - "{{ lookup('file', 'files/backend_hpa.yaml') | from_yaml }}"
+    definition: "{{ item }}" 
+  loop:
+    - "{{ lookup('file', 'files/frontend.yaml') | from_yaml }}"
+    - "{{ lookup('file', 'files/dbsec.yaml') | from_yaml }}"
+    - "{{ lookup('file', 'files/backend.yaml') | from_yaml }}"
+    - "{{ lookup('file', 'files/frontend_service.yaml') | from_yaml }}"
+    - "{{ lookup('file', 'files/backend_service.yaml') | from_yaml }}"
+    - "{{ lookup('file', 'files/database_pvc.yaml') | from_yaml }}"
+    - "{{ lookup('file', 'files/postgres.yaml') | from_yaml }}"
+    - "{{ lookup('file', 'files/postgres_service.yaml') | from_yaml }}"
+    - "{{ lookup('file', 'files/ingress.yaml') | from_yaml }}"
+    - "{{ lookup('file', 'files/frontend_hpa.yaml') | from_yaml }}"
+    - "{{ lookup('file', 'files/backend_hpa.yaml') | from_yaml }}"
