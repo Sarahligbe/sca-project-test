@@ -304,6 +304,7 @@ resource "azurerm_private_endpoint" "key_vault" {
 }
 
 module "azure_file" {
+  source = "./modules/azure_file"
   name = var.azure_file_name
   resource_group_name = azurerm_resource_group.main.name
   location = var.location
