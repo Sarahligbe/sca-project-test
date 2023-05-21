@@ -181,7 +181,7 @@ resource "azurerm_user_assigned_identity" "cert-manager" {
 
 resource "azurerm_role_assignment" "dns_contributor" {
   scope                = data.azurerm_subscription.current.id
-  role_definition_name = "DNS Contributor"
+  role_definition_name = "DNS Zone Contributor"
   principal_id         = azurerm_user_assigned_identity.cert-manager.principal_id
   skip_service_principal_aad_check = true
 }

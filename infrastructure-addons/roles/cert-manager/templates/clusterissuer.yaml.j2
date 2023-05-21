@@ -9,11 +9,11 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-key-pair
     solvers:
-      - dns01:
+      - dns01: 
           azureDNS:
             resourceGroupName: "{{ resource_group_name }}"
-            subscriptionID: "{{ subscription_id }}'
+            subscriptionID: "{{ subscription_id }}"
             hostedZoneName: "{{ domain }}"
             environment: AzurePublicCloud
             managedIdentity:
-              clientID: "{{ lookup('ansible.builtin.env', 'USER_ASSIGNED_IDENTITY_CLIENT_ID') }}"
+              clientID: "d011234d-816b-4bb3-874d-d87c84c7c02f"
