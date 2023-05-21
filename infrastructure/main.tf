@@ -20,6 +20,11 @@ locals {
 
   cert_manager_namespace = "cert-manager"
   cert_manager_service_account = "cert-manager"
+
+  contributor_roles = {
+    network = "Network Contributor"
+    storage = "Storage Account Contributor"
+  }
 }
 
 resource "azurerm_resource_group" "main" {
@@ -77,6 +82,11 @@ module "aks_vnet" {
     {
       name : "ingNodePoolSubnet"
       address_prefixes : var.ing_subnet_address_prefix
+    },
+
+    {
+      name : "privateEndpointSubnet"
+      address_prefixes : var.priv_subnet_address_prefix
     }
   ]
 
@@ -167,8 +177,10 @@ module "aks_cluster" {
 }
 
 resource "azurerm_role_assignment" "network_contributor" {
+  for_each = local.contributor_roles
+
   scope                = azurerm_resource_group.main.id
-  role_definition_name = "Network Contributor"
+  role_definition_name = each.value
   principal_id         = module.aks_cluster.aks_identity_principal_id
   skip_service_principal_aad_check = true
 }
@@ -269,7 +281,7 @@ resource "azurerm_private_endpoint" "key_vault" {
   name                = "${title(module.key_vault.name)}PrivateEndpoint"
   location            = var.location
   resource_group_name = azurerm_resource_group.main.name
-  subnet_id           = module.hub_vnet.subnet_ids["azureVMSubnet"]
+  subnet_id           = module.aks_vnet.subnet_ids["privateEndpointSubnet"]
   tags                = var.tags
 
   private_service_connection {
@@ -291,7 +303,38 @@ resource "azurerm_private_endpoint" "key_vault" {
   }
 }
 
+module "azure_file" {
+  name = var.azure_file_name
+  resource_group_name = azurerm_resource_group.main.name
+  location = var.location
+  vnet_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${azurerm_resource_group.main.name}/providers/Microsoft.Network/virtualNetworks/${module.aks_vnet.vnet_name}"
+}
 
+resource "azurerm_private_endpoint" "azure_file" {
+  name                = "${title(module.azure_file.name)}PrivateEndpoint"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.main.name
+  subnet_id           = module.aks_vnet.subnet_ids["privateEndpointSubnet"]
+  tags                = var.tags
+
+  private_service_connection {
+    name                           = "filePrivateEndpointConnection"
+    private_connection_resource_id = module.azure_file.resource_id
+    is_manual_connection           = false
+    subresource_names              = ["file"]
+  }
+
+  private_dns_zone_group {
+    name                 = "FilePrivateDnsZoneGroup"
+    private_dns_zone_ids = [module.azure_file.private_dns_id]
+  }
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
+}
 
 resource "null_resource" "copy_vm_ip" {
   triggers = {

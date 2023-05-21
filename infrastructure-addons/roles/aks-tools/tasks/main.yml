@@ -27,5 +27,16 @@
 - name: Get AKS cluster credentials
   shell: az aks get-credentials --name scaProjectAKS --resource-group sca-project
 
+- name: Retrieve cert-manager user identity client id to an environment variable
+  shell: export USER_ASSIGNED_IDENTITY_CLIENT_ID=$(az identity show --name "cert-manager" --resource-group "sca-project" --query 'clientId' -o tsv) > /dev/null
+
+- name: Install azure-file-csi driver
+  shell: curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azurefile-csi-driver/v1.1.0/deploy/install-driver.sh | bash -s v1.1.0 --
+
 - name: Install AKS preview CLI extensions
   shell: az extension add --name aks-preview
+
+- name: kubectl apply storage class
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'templates/storage-class-az-file.yaml.j2') | from_yaml }}"

@@ -16,4 +16,4 @@ spec:
             hostedZoneName: "{{ domain }}"
             environment: AzurePublicCloud
             managedIdentity:
-              clientID: "d011234d-816b-4bb3-874d-d87c84c7c02f"
+              clientID: "{{ lookup('ansible.builtin.env', 'USER_ASSIGNED_IDENTITY_CLIENT_ID') }}"

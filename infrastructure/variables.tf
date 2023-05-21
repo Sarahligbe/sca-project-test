@@ -362,3 +362,9 @@ variable "solution_plan_map" {
   }
   type = map(any)
 }
+
+variable "azure_file_name" {
+  description = "Specifies the name of the storage account"
+  type = string
+  default = "scapvcsa"
+}

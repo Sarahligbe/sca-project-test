@@ -14,10 +14,6 @@
     create_namespace: true
     values: "{{ lookup('template', 'templates/values.yaml.j2') | from_yaml }}"
 
-- name: Retrieve cert-manager user identity client id to an environment variable
-  shell: export USER_ASSIGNED_IDENTITY_CLIENT_ID=$(az identity show --name "cert-manager" --resource-group "sca-project" --query 'clientId' -o tsv) > /dev/null
-  delegate_to: localhost
-
 - name: kubectl apply clusterissuer
   kubernetes.core.k8s:
     state: present

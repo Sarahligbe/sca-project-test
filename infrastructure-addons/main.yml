@@ -7,7 +7,7 @@
       apt:
         update_cache: yes
   roles:
-    - name: Configure the VM
+    - name: Configure the AKS through the VM
       role: aks-tools
     - name: Configure Nginx ingress controller
       role: nginx-ingress-controller
