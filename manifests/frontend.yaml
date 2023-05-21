@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: client
-          image: 
+          image: sayaligbe/sca-frontend:latest
           ports:
             - containerPort: 3000
           resources:

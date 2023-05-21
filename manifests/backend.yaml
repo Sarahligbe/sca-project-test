@@ -1,3 +1,13 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pgpassword
+data:
+  PGPASSWORD: cG9zdGdyZXM=
+
+---  
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,7 +29,7 @@ spec:
     spec:
       containers:
         - name: server
-          image:
+          image: sayaligbe/sca-backend:latest
           ports:
             - containerPort: 5000
           resources:
