@@ -312,7 +312,7 @@ module "azure_file" {
 }
 
 resource "azurerm_private_endpoint" "azure_file" {
-  name                = "${title(module.azure_file.name)}PrivateEndpoint"
+  name                = "${title(var.azure_file_name)}PrivateEndpoint"
   location            = var.location
   resource_group_name = azurerm_resource_group.main.name
   subnet_id           = module.aks_vnet.subnet_ids["privateEndpointSubnet"]
