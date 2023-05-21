@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: client
-          image: sayaligbe/sca-frontend:latest
+          image: "{{ frontendImg }}"
           ports:
             - containerPort: 3000
           resources:

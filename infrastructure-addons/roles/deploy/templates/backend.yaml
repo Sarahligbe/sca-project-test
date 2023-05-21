@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: server
-          image: sayaligbe/sca-backend:latest
+          image: "{{ backendImg }}"
           ports:
             - containerPort: 5000
           resources:
