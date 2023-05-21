@@ -4,22 +4,10 @@ data "azurerm_client_config" "current" {
 data "azurerm_subscription" "current" {
 }
 
-data "azurerm_dns_zone" "main" {
-  name                = var.domain
-  resource_group_name = var.dns_rg
-}
-
-output "dns_zone_id" {
-  value = data.azurerm_dns_zone.main.id
-}
-
 locals {
   key_vault_private_dns_zone = "privatelink.vaultcore.azure.net"
   vm_public_ip = "${tostring(module.virtual_machine.public_ip)}"
   fw_public_ip = "${tostring(module.firewall.fw_public_ip)}"
-
-  cert_manager_namespace = "cert-manager"
-  cert_manager_service_account = "cert-manager"
 
   contributor_roles = {
     network = "Network Contributor"
@@ -122,14 +110,6 @@ module "firewall" {
   log_analytics_retention_days = var.log_analytics_retention_days 
 }
 
-resource "azurerm_dns_a_record" "main" {
-  name                = "*"
-  zone_name           = var.domain
-  resource_group_name = var.dns_rg
-  ttl                 = 300
-  records             = [module.firewall.fw_public_ip]
-}
-
 module "routetable" {
   source               = "./modules/route_table"
   resource_group_name  = azurerm_resource_group.main.name
@@ -183,29 +163,6 @@ resource "azurerm_role_assignment" "network_contributor" {
   role_definition_name = each.value
   principal_id         = module.aks_cluster.aks_identity_principal_id
   skip_service_principal_aad_check = true
-}
-
-#User identity for cert-manager dns01 solver
-resource "azurerm_user_assigned_identity" "cert-manager" {
-  location            = azurerm_resource_group.main.location
-  name                = "cert-manager"
-  resource_group_name = azurerm_resource_group.main.name
-}
-
-resource "azurerm_role_assignment" "dns_contributor" {
-  scope                = data.azurerm_subscription.current.id
-  role_definition_name = "DNS Zone Contributor"
-  principal_id         = azurerm_user_assigned_identity.cert-manager.principal_id
-  skip_service_principal_aad_check = true
-}
-
-resource "azurerm_federated_identity_credential" "cert-manager" {
-  name                = "cert-manager"
-  resource_group_name = azurerm_resource_group.main.name
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = module.aks_cluster.oidc_issuer_url
-  parent_id           = azurerm_user_assigned_identity.cert-manager.id
-  subject             = "system:serviceaccount:${local.cert_manager_namespace}:${local.cert_manager_service_account}"
 }
 
 module "virtual_machine" {

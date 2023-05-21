@@ -5,6 +5,7 @@ resource "azurerm_public_ip" "public_ip" {
   zones               = var.zones
   allocation_method   = "Static"
   sku                 = "Standard"
+  domain_name_label   = "sca-project"
 }
 
 resource "azurerm_firewall" "main" {

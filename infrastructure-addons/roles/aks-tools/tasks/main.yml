@@ -27,9 +27,6 @@
 - name: Get AKS cluster credentials
   shell: az aks get-credentials --name scaProjectAKS --resource-group sca-project
 
-- name: Retrieve cert-manager user identity client id to an environment variable
-  shell: export USER_ASSIGNED_IDENTITY_CLIENT_ID=$(az identity show --name "cert-manager" --resource-group "sca-project" --query 'clientId' -o tsv) > /dev/null
-
 - name: Install azure-file-csi driver
   shell: curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azurefile-csi-driver/v1.1.0/deploy/install-driver.sh | bash -s v1.5.0 --
 
