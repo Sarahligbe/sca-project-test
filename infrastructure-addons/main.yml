@@ -11,7 +11,5 @@
       role: aks-tools
     - name: Configure Nginx ingress controller
       role: nginx-ingress-controller
-    - name: Configure cert-manager
-      role: cert-manager
-    - name: Configure ArgoCD
-      role: argocd
+    - name: Deploy the application
+      role: deploy
