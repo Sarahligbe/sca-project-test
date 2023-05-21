@@ -1,54 +1,39 @@
-version: '3.9'
+version: "3"
 services:
-  db:
-    image: postgres:14-alpine
-    ports:
-      - 5432
-    
+  postgres:
+    image: "postgres:latest"
     environment:
-      TZ: "${POSTGRES_TZ}"
-      POSTGRES_USER: "${POSTGRES_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_DB: "${POSTGRES_DB}"
-    
-    volumes:
-      - ./data/db:/var/lib/postgresql/data/
-
-  frontend:
+      - POSTGRES_PASSWORD=postgres_password
+  nginx:
+    depends_on:
+      - api
+      - client
+    restart: always
     build:
-      context: ./eatfoodfrontend
-      dockerfile: Dockerfile
-    
-    environment:
-      WDS_SOCKET_PORT: ${FRONTEND_EXPOSE_PORT}
-    
+      dockerfile: Dockerfile.dev
+      context: ./nginx
     ports:
-      - ${FRONTEND_EXPOSE_PORT}:3000
-    
+      - "3050:80"
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      context: "./server"
     volumes:
-      - ./eatfoodfrontend:/app/frontend
-      - /app/frontend/node_modules
-
-    depends_on:
-      - backend
-
-  backend: 
-    build: 
-      context: ./eatfoodbackend
-      dockerfile: Dockerfile
-    
+      - /app/node_modules
+      - ./server:/app
     environment:
-      POSTGRES_USER: "${POSTGRES_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_DB: "${POSTGRES_DB}"
-      POSTGRES_HOST: "db"
-      POSTGRES_PORT: 5432
-    
-    ports:
-      - ${DJANGO_EXPOSE_PORT}:8000
-
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  client:
+    stdin_open: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
     volumes:
-      - ./eatfoodbackend:/app/backend
-
-    depends_on:
-      - db
+      - /app/node_modules
+      - ./client:/app

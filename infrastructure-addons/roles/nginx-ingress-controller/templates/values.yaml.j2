@@ -1,29 +1,6 @@
----
-fullnameOverride: nginx
-controller:
-  name: controller
-  config:
-    compute-full-forwarded-for: "true"
-    use-forwarded-headers: "true"
-    proxy-body-size: "0"    
+controller:   
   ingressClass: nginx
-  ingressClassResource:
-    enabled: true
-    default: false
-  watchIngressWithoutClass: true
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-            - key: app.kubernetes.io/name
-              operator: In
-              values:
-                - ingress-nginx
-        topologyKey: "kubernetes.io/hostname"
-  replicaCount: 1
-  admissionWebhooks:
-    enabled: true
+  replicaCount: 3
   service:
     annotations:
       service.beta.kubernetes.io/azure-load-balancer-internal: "true"
