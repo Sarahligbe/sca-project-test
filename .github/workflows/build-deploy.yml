@@ -1,7 +1,6 @@
 on:
   push:
-    branches: [ main ]
-    paths: .github/workflows/4-actions-ci-cd-aks-tf-backend-jobs.yml
+    branches: [ master ]
   pull_request:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -49,10 +48,12 @@ jobs:
         sed -i '/^frontendImg:.*/ s//frontendImg:$DOCKER_REPOSITORY\/$FRONTEND_IMAGE_NAME:$IMAGE_TAG/' infrastructure-addons/group_vars/all/vars.yml
         sed -i '/^backendImg:.*/ s//backendImg:$DOCKER_REPOSITORY\/$BACKEND_IMAGE_NAME:$IMAGE_TAG/' infrastructure-addons/group_vars/all/vars.yml
 
-    - name: Log in with Azure
+    - name: 'Az CLI login'
       uses: azure/login@v1
       with:
-        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
 #provision infrastructure
         
