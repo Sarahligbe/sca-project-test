@@ -10,6 +10,10 @@ jobs:
 
   build-images:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./infrastructure
     env:
       DOCKER_REPOSITORY: sayaligbe 
       FRONTEND_IMAGE_NAME: sca-frontend
@@ -18,13 +22,18 @@ jobs:
 
     steps:
 
+    - name: Add mask to hide secrets 
+        run: |
+          echo "::add-mask::${{ secrets.SUB_ID }}"
+          echo "::add-mask::${{ secrets.SSH }}"
+
     - name: Git Checkout
       uses: actions/checkout@v2
 
     - name: Build Docker images
       run: |
-        docker build ./source-code/client --file ./source-code/client/Dockerfile  --tag $DOCKER_REPOSITORY/$FRONTEND_IMAGE_NAME:$IMAGE_NUMBER --no-cache
-        docker build ./source-code/client --file ./source-code/client/Dockerfile  --tag $DOCKER_REPOSITORY/$BACKEND_IMAGE_NAME:$IMAGE_NUMBER --no-cache
+        docker build ../source-code/client --file ../source-code/client/Dockerfile  --tag $DOCKER_REPOSITORY/$FRONTEND_IMAGE_NAME:$IMAGE_NUMBER --no-cache
+        docker build ../source-code/client --file ../source-code/client/Dockerfile  --tag $DOCKER_REPOSITORY/$BACKEND_IMAGE_NAME:$IMAGE_NUMBER --no-cache
 
     - name: Login to Docker Hub
         uses: docker/login-action@v1
@@ -39,21 +48,36 @@ jobs:
 
     - name: Update the docker images in the kubernetes manifests
       run: |
-        sed -i 's/^frontendImg/frontendImg:$DOCKER_REPOSITORY/$FRONTEND_IMAGE_NAME:$IMAGE_NUMBER/' infrastructure-addons/group_vars/all/vars.yml
-        sed -i 's/^frontendImg/backendImg:$DOCKER_REPOSITORY/$BACKEND_IMAGE_NAME:$IMAGE_NUMBER/' infrastructure-addons/group_vars/all/vars.yml
+        sed -i '/^frontendImg:.*/ s//frontendImg:$DOCKER_REPOSITORY\/$FRONTEND_IMAGE_NAME:$IMAGE_NUMBER/' infrastructure-addons/group_vars/all/vars.yml
+        sed -i '/^backendImg:.*/ s//backendImg:$DOCKER_REPOSITORY\/$BACKEND_IMAGE_NAME:$IMAGE_NUMBER/' infrastructure-addons/group_vars/all/vars.yml
   
-  provision-infrastructure:
-    runs-on: ubuntu-latest
-    needs: [ build-images ]
-
-    steps:
-    - name: Checkout the repository to the runner
-      uses: actions/checkout@v3
+#provision infrastructure
         
     - name: Setup Terraform with specified version on the runner
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.4.0
+
+#Set up the backend
+    - name: Terraform init ../terraform-backend
+      id: init-backend
+      run: |
+        cd ../terraform-backend
+        terraform init
+
+    - name: Terraform plan ../terraform-backend
+      id: plan-backend
+      run: |
+        cd ../terraform-backend
+        terraform plan -input=false
+
+    - name: Terraform apply ../terraform-backend
+      id: apply-backend
+      run: |
+        cd ../terraform-backend
+        terraform apply -auto-approve -input=false
+
+#Provision infrastructure
 
     - name: Terraform init
       id: init
@@ -71,13 +95,7 @@ jobs:
       id: apply
       run: terraform apply -var="ssh_public_key=${{ secrets.SSH }}" -auto-approve -input=false
 
-  deploy_workload:
-    runs-on: ubuntu-latest
-    needs: [ provision-infrastructure ]
-
-    steps:
-    - name: Checkout the repository to the runner
-      uses: actions/checkout@v3
+#deploy workload
 
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
@@ -86,18 +104,18 @@ jobs:
 
     - name: Install dependencies Including Ansible
       run: |
-        sudo apt update
-        sudo apt install software-properties-common
-        sudo add-apt-repository --yes --update ppa:ansible/ansible
-        sudo apt install ansible
+        apt update
+        apt install software-properties-common
+        add-apt-repository --yes --update ppa:ansible/ansible
+        apt install ansible
 
     - name: Install SSH key
       uses: shimataro/ssh-key-action@v2
       with:
         key: ${{ secrets.SSH_KEY }}
-        name: id_rsa # optional
+        name: id_rsa
         known_hosts: unnecessary
-        if_key_exists: fail # replace / ignore / fail; optional (defaults to fail)
+        if_key_exists: fail
 
     - name: run playbook
         run: |
