@@ -106,10 +106,10 @@ jobs:
 
     - name: Install dependencies Including Ansible
       run: |
-        apt update
-        apt install software-properties-common
-        add-apt-repository --yes --update ppa:ansible/ansible
-        apt install ansible
+        sudo apt update
+        sudo apt install software-properties-common
+        sudo add-apt-repository --yes --update ppa:ansible/ansible
+        sudo apt install ansible
 
     - name: Install SSH key
       uses: shimataro/ssh-key-action@v2
@@ -120,5 +120,6 @@ jobs:
         if_key_exists: fail
 
     - name: run playbook
-        run: |
-          echo '${{ secrets.VAULT_PASSWORD }}' | ansible-playbook main.yml --vault-pass-file=/bin/cat 
+      run: |
+        cd ../infrastructure-addons
+        echo '${{ secrets.VAULT_PASSWORD }}' | ansible-playbook main.yml --vault-pass-file=/bin/cat 
