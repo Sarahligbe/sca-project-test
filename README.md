@@ -17,9 +17,9 @@ The project contains the following:
 - Two Virtual networks that communicate with each other via Vnet peering
 - A firewall and a virtual machine in the hub network. The firewall monitors incoming and outgoing traffic based on the DNAT, Network and Application rules defined. The virtual machine is used to access the private cluster and run commands on it.
 - An internal ingress controller. The firewall sends the traffic to the ingress controller which in turn routes the traffic to the different services in the cluster.
-<<<<<<< HEAD
 - Azure key vault, Ansible vault, and Github Actions secrets are used for secrets management.
 - Log analytics workspace is used to collect metrics and logs from the resources provisioned in the cluster
+- A GitHub Actions CI/CD pipeline to automate the building, provisioning and deployment of the project
 
 
 ### To run the project locally:
@@ -55,9 +55,5 @@ App:
 
 Monitoring:
 ![monitoring](metrics.jpg)
-=======
-- Azure key vault and Ansible vault are used for secrets management.
-- Log analytics workspace is used to collect metrics and logs from the resources provisioned in the cluster.
-- A GitHub Actions CI/CD pipeline to automate the building, provisioning and deployment of the project 
 
->>>>>>> 342b6fef1cbad5f0f6640500cc4836e73f4deba7
+
