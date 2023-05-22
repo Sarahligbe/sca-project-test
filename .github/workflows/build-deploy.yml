@@ -13,7 +13,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./infrastructure
+        working-directory: infrastructure
     env:
       DOCKER_REPOSITORY: sayaligbe 
       FRONTEND_IMAGE_NAME: sca-frontend
