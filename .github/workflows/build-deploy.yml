@@ -48,6 +48,10 @@ jobs:
         docker push $DOCKER_REPOSITORY/$FRONTEND_IMAGE_NAME:$IMAGE_TAG
         docker push $DOCKER_REPOSITORY/$BACKEND_IMAGE_NAME:$IMAGE_TAG
 
+    - name: Update kubernetes manifest with the current tag
+      run: |
+        sh "sed -i 's/latest/$IMAGE_TAG/g' infrastructure-addons/group_vars/all/vars.yml"
+
     - name: Log in to Azure using OIDC
       uses: azure/login@v1
       with:
