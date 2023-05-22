@@ -19,13 +19,15 @@ jobs:
       FRONTEND_IMAGE_NAME: sca-frontend
       BACKEND_IMAGE_NAME: sca-backend
       IMAGE_TAG: ${{ github.run_number }} # $GITHUB_RUN_NUMBER
+      SUB_ID: ${{ secrets.SUB_ID }}
+      SSH: ${{ secrets.SSH }}
 
     steps:
 
     - name: Add mask to hide secrets 
         run: |
-          echo "::add-mask::${{ secrets.SUB_ID }}"
-          echo "::add-mask::${{ secrets.SSH }}"
+          echo "::add-mask::$SUB_ID"
+          echo "::add-mask::$SSH"
 
     - name: Git Checkout
       uses: actions/checkout@v2
