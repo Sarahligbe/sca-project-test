@@ -13,6 +13,7 @@ jobs:
 
   build-images:
     runs-on: ubuntu-latest
+    environment: testrun
     env:
       DOCKER_REPOSITORY: sayaligbe 
       FRONTEND_IMAGE_NAME: sca-frontend
