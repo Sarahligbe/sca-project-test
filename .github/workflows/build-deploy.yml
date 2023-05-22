@@ -30,8 +30,8 @@ jobs:
 
     - name: Build Docker images
       run: |
-        docker build source-code/client --file source-code/client/Dockerfile  --tag $DOCKER_REPOSITORY/$FRONTEND_IMAGE_NAME:$IMAGE_NUMBER --no-cache
-        docker build source-code/client --file source-code/client/Dockerfile  --tag $DOCKER_REPOSITORY/$BACKEND_IMAGE_NAME:$IMAGE_NUMBER --no-cache
+        docker build source-code/client --file source-code/client/Dockerfile  --tag $DOCKER_REPOSITORY/$FRONTEND_IMAGE_NAME:$IMAGE_TAG --no-cache
+        docker build source-code/client --file source-code/client/Dockerfile  --tag $DOCKER_REPOSITORY/$BACKEND_IMAGE_NAME:$IMAGE_TAG --no-cache
 
     - name: Login to Docker Hub
       uses: docker/login-action@v1
@@ -41,13 +41,13 @@ jobs:
 
     - name: Push Image to Docker Hub
       run: |
-        docker push $DOCKER_REPOSITORY/$FRONTEND_IMAGE_NAME:$IMAGE_NUMBER
-        docker push $DOCKER_REPOSITORY/$BACKEND_IMAGE_NAME:$IMAGE_NUMBER
+        docker push $DOCKER_REPOSITORY/$FRONTEND_IMAGE_NAME:$IMAGE_TAG
+        docker push $DOCKER_REPOSITORY/$BACKEND_IMAGE_NAME:$IMAGE_TAG
 
     - name: Update the docker images in the kubernetes manifests
       run: |
-        sed -i '/^frontendImg:.*/ s//frontendImg:$DOCKER_REPOSITORY\/$FRONTEND_IMAGE_NAME:$IMAGE_NUMBER/' infrastructure-addons/group_vars/all/vars.yml
-        sed -i '/^backendImg:.*/ s//backendImg:$DOCKER_REPOSITORY\/$BACKEND_IMAGE_NAME:$IMAGE_NUMBER/' infrastructure-addons/group_vars/all/vars.yml
+        sed -i '/^frontendImg:.*/ s//frontendImg:$DOCKER_REPOSITORY\/$FRONTEND_IMAGE_NAME:$IMAGE_TAG/' infrastructure-addons/group_vars/all/vars.yml
+        sed -i '/^backendImg:.*/ s//backendImg:$DOCKER_REPOSITORY\/$BACKEND_IMAGE_NAME:$IMAGE_TAG/' infrastructure-addons/group_vars/all/vars.yml
   
 #provision infrastructure
         
