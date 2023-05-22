@@ -11,5 +11,5 @@ cert_manager_chart_version: "v1.11.0"
 ingress_ip: '10.1.32.17'
 subscription_id: "{{ vault_subscription_id }}"
 resource_group_name: "sca-project"
-frontendImg:
-backendImg:
+frontendImg: "sayaligbe/sca-frontend:latest"
+backendImg: "sayaligbe/sca-backend:latest"
