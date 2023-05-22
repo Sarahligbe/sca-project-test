@@ -48,7 +48,12 @@ jobs:
       run: |
         sed -i '/^frontendImg:.*/ s//frontendImg:$DOCKER_REPOSITORY\/$FRONTEND_IMAGE_NAME:$IMAGE_TAG/' infrastructure-addons/group_vars/all/vars.yml
         sed -i '/^backendImg:.*/ s//backendImg:$DOCKER_REPOSITORY\/$BACKEND_IMAGE_NAME:$IMAGE_TAG/' infrastructure-addons/group_vars/all/vars.yml
-  
+
+    - name: Log in with Azure
+      uses: azure/login@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
 #provision infrastructure
         
     - name: Setup Terraform with specified version on the runner
