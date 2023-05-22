@@ -25,9 +25,9 @@ jobs:
     steps:
 
     - name: Add mask to hide secrets 
-        run: |
-          echo "::add-mask::$SUB_ID"
-          echo "::add-mask::$SSH"
+      run: |
+        echo "::add-mask::$SUB_ID"
+        echo "::add-mask::$SSH"
 
     - name: Git Checkout
       uses: actions/checkout@v2
