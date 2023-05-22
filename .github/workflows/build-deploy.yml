@@ -5,6 +5,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
 
   build-images:
@@ -48,12 +52,12 @@ jobs:
         sed -i '/^frontendImg:.*/ s//frontendImg:$DOCKER_REPOSITORY\/$FRONTEND_IMAGE_NAME:$IMAGE_TAG/' infrastructure-addons/group_vars/all/vars.yml
         sed -i '/^backendImg:.*/ s//backendImg:$DOCKER_REPOSITORY\/$BACKEND_IMAGE_NAME:$IMAGE_TAG/' infrastructure-addons/group_vars/all/vars.yml
 
-    - name: 'Az CLI login'
+    - name: Log in to Azure using OIDC
       uses: azure/login@v1
       with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
 #provision infrastructure
         
@@ -68,18 +72,33 @@ jobs:
       run: |
         cd terraform-backend
         terraform init
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_USE_OIDC: true
 
     - name: Terraform plan ../terraform-backend
       id: plan-backend
       run: |
         cd terraform-backend
         terraform plan -input=false
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_USE_OIDC: true
 
     - name: Terraform apply ../terraform-backend
       id: apply-backend
       run: |
         cd terraform-backend
         terraform apply -auto-approve -input=false
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_USE_OIDC: true
 
 #Provision infrastructure
 
@@ -88,12 +107,22 @@ jobs:
       run: |
         cd infrastructure
         terraform init 
-        
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_USE_OIDC: true
+
     - name: Terraform plan
       id: plan
       run: |
         cd infrastructure
         terraform plan -var="ssh_public_key=${{ secrets.SSH }}" -input=false
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_USE_OIDC: true
       
     - name: Terraform Plan Status
       if: steps.plan.outcome == 'failure'
@@ -106,6 +135,11 @@ jobs:
       run: |
         cd infrastructure
         terraform apply -var="ssh_public_key=${{ secrets.SSH }}" -auto-approve -input=false
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_USE_OIDC: true
 
 #deploy workload
 
