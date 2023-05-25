@@ -1,6 +1,6 @@
 ## Deployed a 3-tier application to a private Azure Kubernetes Service Cluster
 
-Access the project [here](http://sca-project.uksouth.cloudapp.azure.com/)
+Access the project [here](http://sca-project.uksouth.cloudapp.azure.com/) (It is no longer available)
 
 - The source code and Dockerfiles can be found in the source-code directory. It was built with React, Node.js and Postgres
 
@@ -12,6 +12,8 @@ Access the project [here](http://sca-project.uksouth.cloudapp.azure.com/)
 
 - The terraform-backend contains terraform scripts to configure a backend to store the terraform state files.
 
+### Architectural Diagram
+![architectural diagram](infra.png)
 
 The project contains the following:
 - Two Virtual networks that communicate with each other via Vnet peering
