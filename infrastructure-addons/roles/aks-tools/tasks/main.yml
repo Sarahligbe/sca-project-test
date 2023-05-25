@@ -33,7 +33,7 @@
 - name: Install AKS preview CLI extensions
   shell: az extension add --name aks-preview
 
-- name: kubectl apply storage class
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('template', 'templates/storage-class-az-file.yaml.j2') | from_yaml }}"
+#- name: kubectl apply storage class
+#  kubernetes.core.k8s:
+#    state: present
+#    definition: "{{ lookup('template', 'templates/storage-class-az-file.yaml.j2') | from_yaml }}"

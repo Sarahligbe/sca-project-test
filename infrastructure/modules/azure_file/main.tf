@@ -2,12 +2,11 @@ resource "azurerm_storage_account" "storage_account" {
   name                      = var.name
   resource_group_name       = var.resource_group_name
   location                  = var.location
-  account_tier              = "Premium"
+  account_tier              = "Standard"
   account_replication_type  = "LRS"
-  account_kind              = "FileStorage"
-  enable_https_traffic_only = true
+  account_kind              = "StorageV2"
   tags                      = var.tags
-  # We are enabling the firewall only allowing traffic from our PC's public IP.
+  # Disable public endpoint
   network_rules {
     default_action             = "Deny"
     virtual_network_subnet_ids = []

@@ -3,13 +3,9 @@
 # These are the variables used by the playbooks
 # The variables with vault prefix are linked to the variables in the vault file
 
-domain: "sarahaligbe.me"
-email: "{{ vault_email }}"
 ingress_chart_version: "4.5.2"
-argocd_chart_version: "5.27.0"
-cert_manager_chart_version: "v1.11.0"
 ingress_ip: '10.1.32.17'
-subscription_id: "{{ vault_subscription_id }}"
 resource_group_name: "sca-project"
 frontendImg: "sayaligbe/sca-frontend:latest"
 backendImg: "sayaligbe/sca-backend:latest"
+db-password: "{{ vault_db-password}}"

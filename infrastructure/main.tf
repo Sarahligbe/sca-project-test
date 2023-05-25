@@ -260,44 +260,43 @@ resource "azurerm_private_endpoint" "key_vault" {
   }
 }
 
-module "azure_file" {
-  source = "./modules/azure_file"
-  name = var.azure_file_name
-  resource_group_name = azurerm_resource_group.main.name
-  location = var.location
-  vnet_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${azurerm_resource_group.main.name}/providers/Microsoft.Network/virtualNetworks/${module.aks_vnet.vnet_name}"
-}
+#module "azure_file" {
+#  source = "./modules/azure_file"
+#  name = var.azure_file_name
+#  resource_group_name = azurerm_resource_group.main.name
+#  location = var.location
+#  vnet_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${azurerm_resource_group.main.name}/providers/Microsoft.Network/virtualNetworks/${module.aks_vnet.vnet_name}"
+#}
 
-resource "azurerm_private_endpoint" "azure_file" {
-  name                = "${title(var.azure_file_name)}PrivateEndpoint"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.main.name
-  subnet_id           = module.aks_vnet.subnet_ids["privateEndpointSubnet"]
-  tags                = var.tags
-
-  private_service_connection {
-    name                           = "filePrivateEndpointConnection"
-    private_connection_resource_id = module.azure_file.resource_id
-    is_manual_connection           = false
-    subresource_names              = ["file"]
-  }
-
-  private_dns_zone_group {
-    name                 = "FilePrivateDnsZoneGroup"
-    private_dns_zone_ids = [module.azure_file.private_dns_id]
-  }
-
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
-}
+#resource "azurerm_private_endpoint" "azure_file" {
+#  name                = "${title(var.azure_file_name)}PrivateEndpoint"
+#  location            = var.location
+#  resource_group_name = azurerm_resource_group.main.name
+#  subnet_id           = module.aks_vnet.subnet_ids["privateEndpointSubnet"]
+#  tags                = var.tags
+#
+#  private_service_connection {
+#    name                           = "filePrivateEndpointConnection"
+#    private_connection_resource_id = module.azure_file.resource_id
+#    is_manual_connection           = false
+#    subresource_names              = ["file"]
+#  }
+#
+#  private_dns_zone_group {
+#    name                 = "FilePrivateDnsZoneGroup"
+#    private_dns_zone_ids = [module.azure_file.private_dns_id]
+#  }
+#
+#  lifecycle {
+#    ignore_changes = [
+#      tags
+#    ]
+#  }
+#}
 
 resource "null_resource" "copy_vm_ip" {
   triggers = {
     public_ip = "${local.vm_public_ip}"
-    fw_public_ip = "${local.fw_public_ip}"
   }
 
 #On resource creation

@@ -6,7 +6,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: private-azurefile-csi
+  storageClassName: azurefile-csi
   resources:
     requests:
       storage: 1Gi

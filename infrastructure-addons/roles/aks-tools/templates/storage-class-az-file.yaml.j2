@@ -1,21 +1,16 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: private-azurefile-csi
+  name: my-azurefile
 provisioner: file.csi.azure.com
 allowVolumeExpansion: true
-parameters:
-  resourceGroup: sca-project
-  storageAccount: scapvcsa
-  server: scapvcsa.file.core.windows.net 
-reclaimPolicy: Delete
-volumeBindingMode: Immediate
 mountOptions:
   - dir_mode=0777
   - file_mode=0777
   - uid=0
   - gid=0
   - mfsymlinks
-  - cache=strict  # https://linux.die.net/man/8/mount.cifs
-  - nosharesock  # reduce probability of reconnect race
-  - actimeo=30  # reduce latency for metadata-heavy workload
+  - cache=strict
+  - actimeo=30
+parameters:
+  skuName: Standard_LRS
