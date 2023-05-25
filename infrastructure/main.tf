@@ -8,11 +8,6 @@ locals {
   key_vault_private_dns_zone = "privatelink.vaultcore.azure.net"
   vm_public_ip = "${tostring(module.virtual_machine.public_ip)}"
   fw_public_ip = "${tostring(module.firewall.fw_public_ip)}"
-
-  contributor_roles = {
-    network = "Network Contributor"
-    storage = "Storage Account Contributor"
-  }
 }
 
 resource "azurerm_resource_group" "main" {
@@ -157,10 +152,8 @@ module "aks_cluster" {
 }
 
 resource "azurerm_role_assignment" "network_contributor" {
-  for_each = local.contributor_roles
-
   scope                = azurerm_resource_group.main.id
-  role_definition_name = each.value
+  role_definition_name = "Network Contributor"
   principal_id         = module.aks_cluster.aks_identity_principal_id
   skip_service_principal_aad_check = true
 }
