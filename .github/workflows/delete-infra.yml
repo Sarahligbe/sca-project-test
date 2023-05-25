@@ -1,0 +1,53 @@
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+
+  destroy-infra:
+    runs-on: ubuntu-latest
+    environment: testrun
+    env:
+      SUB_ID: ${{ secrets.SUB_ID }}
+      SSH: ${{ secrets.SSH }}
+
+    steps:
+
+    - name: Add mask to hide secrets 
+      run: |
+        echo "::add-mask::$SUB_ID"
+        echo "::add-mask::$SSH"
+
+    - name: Git Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Terraform with specified version on the runner
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.4.0
+
+    - name: Terraform init
+      id: init
+      run: |
+        cd infrastructure
+        terraform init 
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_USE_OIDC: true
+
+    - name: Terraform apply
+      id: destroy
+      run: |
+        cd infrastructure
+        terraform destroy -var="ssh_public_key=${{ secrets.SSH }}" -auto-approve -input=false
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_USE_OIDC: true
