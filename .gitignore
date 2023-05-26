@@ -1,9 +1,6 @@
 # Local .terraform directories
 **/.terraform/*
 
-infrastructure/modules/bastion/
-infrastructure-addons/roles/dns/
-
 # .tfstate files
 *.tfstate
 *.tfstate.*
