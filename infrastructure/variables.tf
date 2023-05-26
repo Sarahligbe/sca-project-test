@@ -353,22 +353,6 @@ variable "log_analytics_workspace_name" {
   default = "project"
 }
 
-variable "solution_plan_map" {
-  description = "Specifies solutions to deploy to log analytics workspace"
-  default     = {
-    ContainerInsights= {
-      product   = "OMSGallery/ContainerInsights"
-      publisher = "Microsoft"
-    }
-
-    NetworkMonitoring= {
-      product   = "OMSGallery/NetworkMonitoring"
-      publisher = "Microsoft"
-    }
-  }
-  type = map(any)
-}
-
 variable "azure_file_name" {
   description = "Specifies the name of the storage account"
   type = string
