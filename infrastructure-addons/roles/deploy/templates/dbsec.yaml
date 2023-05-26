@@ -5,4 +5,4 @@ metadata:
   name: pgpassword
   namespace: project
 data:
-  PGPASSWORD: "{{ db-password }}"
+  PGPASSWORD: "{{ db_password }}"

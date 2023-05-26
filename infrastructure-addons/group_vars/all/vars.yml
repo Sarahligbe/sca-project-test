@@ -8,4 +8,4 @@ ingress_ip: '10.1.32.17'
 resource_group_name: "sca-project"
 frontendImg: "sayaligbe/sca-frontend:latest"
 backendImg: "sayaligbe/sca-backend:latest"
-db-password: "{{ vault_db-password}}"
+db_password: "{{ vault_db_password}}"

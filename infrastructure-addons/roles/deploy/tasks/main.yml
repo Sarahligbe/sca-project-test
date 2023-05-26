@@ -11,7 +11,7 @@
     definition: "{{ item }}" 
   loop:
     - "{{ lookup('template', 'templates/frontend.yaml') | from_yaml }}"
-    - "{{ lookup('template', 'templates/dbsec.yaml.j2') | from_yaml }}"
+    - "{{ lookup('template', 'templates/dbsec.yaml') | from_yaml }}"
     - "{{ lookup('template', 'templates/backend.yaml') | from_yaml }}"
     - "{{ lookup('template', 'templates/frontend_service.yaml') | from_yaml }}"
     - "{{ lookup('template', 'templates/backend_service.yaml') | from_yaml }}"
