@@ -57,5 +57,6 @@ App:
 
 Monitoring:
 ![monitoring](metrics.jpg)
+![firewall logs](fw-logs.jpg)
 
 
