@@ -13,7 +13,7 @@ Access the project [here](http://sca-project.uksouth.cloudapp.azure.com/) (It is
 - The terraform-backend contains terraform scripts to configure a backend to store the terraform state files.
 
 ### Architectural Diagram
-![architectural diagram](infra.png)
+![architectural diagram](infrastructure.png)
 
 The project contains the following:
 - Two Virtual networks that communicate with each other via Vnet peering
